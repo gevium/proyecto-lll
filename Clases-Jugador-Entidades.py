@@ -1,5 +1,42 @@
 import json as json
 import os as os #permite manejar el sistema de archivos
+import tkinter as tk
+from tkinter import messagebox
+
+'''
+########################################################################
+DATOS DE LAS ENTIDADES
+########################################################################
+'''
+
+TORRES = {
+    "basica": {"nombre": "Torre Basica", "costo": 50, "vida": 80, "dano": 15,"alcance": 2, "habilidad": "disparo_doble", "turnos_habilidad": 3},
+    "pesada": {"nombre": "Torre Pesada", "costo": 120,"vida": 180, "dano": 25,"alcance": 2,"habilidad": "dano_area","turnos_habilidad": 4},
+    "magica": {"nombre": "Torre Magica","costo": 90, "vida": 60,"dano": 10, "alcance": 3,"habilidad": "congelar", "turnos_habilidad": 5}
+}
+ 
+UNIDADES = {
+    "soldado": {"nombre": "Soldado", "costo": 40, "vida": 60, "dano": 12, "velocidad": 1, "habilidad": "ataque_doble","turnos_habilidad": 3},
+    "tanque": {"nombre": "Tanque", "costo": 100, "vida": 200, "dano": 20,"velocidad": 1,"habilidad": "escudo_temporal", "turnos_habilidad": 4},
+    "rapida": {"nombre": "Unidad Rapida","costo": 60,"vida": 50,"dano": 8,"velocidad": 2,"habilidad": "aumento_velocidad","turnos_habilidad": 3}
+}
+ 
+#FACCIONES
+#Se pueden remplazar con imagenes. Version preliminar: colores
+FACCIONES = {
+    "medieval": {"nombre": "Medieval", "color_torre": "#8B4513", "color_muro": "#A9A9A9", "color_unidad": "#556B2F", "color_base": "#FFD700"},
+    "futurista": {"nombre": "Futurista","color_torre": "#00CED1","color_muro": "#4682B4","color_unidad": "#FF4500","color_base": "#9400D3"},
+    "naturaleza": {"nombre": "Naturaleza","color_torre": "#228B22","color_muro": "#8B5A2B","color_unidad": "#6B8E23","color_base": "#32CD32"}
+}
+ 
+#Valores iniciales
+DINERO_INICIAL_DEFENSOR = 200
+DINERO_INICIAL_ATACANTE = 200
+DINERO_POR_RONDA = 50
+TAMANO_MAPA = 10  #cuadricula 10x10
+VIDA_BASE_CENTRAL = 200
+RONDAS_PARA_GANAR = 3
+
 
 RUTA_ARCHIVO = os.path.join("data", "jugadores.json") #ruta hacia el archivo de jugadores
 
@@ -247,10 +284,3 @@ class BaseCentral(Entidad):
     def __init__(self, vida=200, posicion=(0, 0)):
         super().__init__("Base Central", vida)
         self.posicion = posicion
-
-
-'''
-########################################################################
-DATOS DEL JUEGO
-########################################################################
-'''
