@@ -1,7 +1,5 @@
 import json as json
 import os as os #permite manejar el sistema de archivos
-import tkinter as tk
-from tkinter import messagebox
 
 '''
 ########################################################################
@@ -65,11 +63,12 @@ class Jugador:
         
         #Convierte la información de un jugador en un diccionario (con el fin de poder utilizarlo en Json)
         def convertir_diccionario(self):
-             return {"nombre_usuario": self.nombre_usuario,"contrasena": self.contrasena,"victorias_defensor": self.victorias_defensor,"victorias_atacante": self.victorias_atacante}
+             return {"nombre_usuario": self.nombre_usuario,"contraseña": self.contraseña,"victorias_defensor": self.victorias_defensor,"victorias_atacante": self.victorias_atacante}
         
         #Crea un jugador con la información de un diccionario (para traer jugador del archivo Json)
-        def crear_jugador_dicc(self, datos):
-             return Jugador (datos["nombre_usuario"], datos["contrasena"], datos.get("victorias_defensor", 0), datos.get("victorias_atacante", 0))
+        @staticmethod
+        def crear_jugador_dicc(datos):
+             return Jugador (datos["nombre_usuario"], datos["contraseña"], datos.get("victorias_defensor", 0), datos.get("victorias_atacante", 0))
         #el datos.get() evita errores en caso de que no se haya introducido un valor en victorias_defensor o victorias_atacante        
 
 
@@ -79,8 +78,8 @@ class Jugadores_Json:
     #construcor
     def __init__(self, ruta = RUTA_ARCHIVO):
         self.jugadores = {}
-        self.cargar = ()
         self.ruta = ruta
+        self.cargar()
     
     #funcion que permite cargar los jugadores desde el archivo json
     def cargar(self):
@@ -88,35 +87,35 @@ class Jugadores_Json:
             with open(self.ruta, "r", encoding="utf-8") as archivo:
                 datos = json.load(archivo)
                 for nombre, info in datos.items():
-                    self.jugadores[nombre] = Jugador.from_dict(info)
+                    self.jugadores[nombre] = Jugador.crear_jugador_dicc(info)
         else:
             self.jugadores = {} #no hay jugadores
     
     #permite guardar todos los nombres en el archivo json
     def guardar(self):
-        datos = {nombre: jugador.to_dict() for nombre, jugador in self.jugadores.items()}
+        datos = {nombre: jugador.convertir_diccionario() for nombre, jugador in self.jugadores.items()}
         os.makedirs(os.path.dirname(self.ruta), exist_ok=True)
         with open(self.ruta, "w", encoding="utf-8") as archivo:
             json.dump(datos, archivo, indent=4, ensure_ascii=False)
 
     #permite registrar el nombre del jugador. Retorna True si se logro con exito
-    def registrar(self, nombre_usuario, contrasena):
+    def registrar(self, nombre_usuario, contraseña):
         if nombre_usuario in self.jugadores:
             return False, "Ese nombre de usuario ya existe."
  
-        nuevo_jugador = Jugador(nombre_usuario, contrasena)
+        nuevo_jugador = Jugador(nombre_usuario, contraseña)
         self.jugadores[nombre_usuario] = nuevo_jugador
         self.guardar()
         return True, "Registro exitoso."
 
     #verifica que el jugador y su contraseña existan en el diccionario
-    def iniciar_sesion(self, nombre_usuario, contrasena):
+    def iniciar_sesion(self, nombre_usuario, contraseña):
         if nombre_usuario not in self.jugadores: #validacion
             return False, "Usuario no encontrado."
  
         jugador = self.jugadores[nombre_usuario]
-        if jugador.contrasena != contrasena: #validacion 
-            return False, "Contrasena incorrecta."
+        if jugador.contraseña != contraseña: #validacion 
+            return False, "contraseña incorrecta."
  
         return True, jugador #retorna tupla
     
