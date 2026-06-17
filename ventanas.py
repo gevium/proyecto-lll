@@ -56,6 +56,10 @@ def mostrar_login(root):
 
     tk.Button(root, text = "Iniciar sesión", command=lambda: iniciar_sesion(root,entry_user, entry_contra), width=20).pack(pady=10)
     tk.Button(root, text = "Registrarse", command=lambda: registrar(root, entry_user, entry_contra), width=20).pack(pady=10)
+    
+    def ir_a_top():
+        mostrar_top_jugadores(root)
+    tk.Button(root, text="Top Jugadores", command=ir_a_top, width=20).pack(pady=10)
 
 def mostrar_mapa(root, jugador):
     limpiar_pantalla(root)
@@ -92,3 +96,37 @@ def mostrar_mapa(root, jugador):
     y2 = y1 + TAMANO_CASILLA
     canvas.create_rectangle(x1, y1, x2, y2, fill="gold", outline="black")
     canvas.create_text(x1 + 25, y1 + 25, text="BASE", font=("Arial", 7, "bold"))
+
+def mostrar_top_jugadores(root):
+    limpiar_pantalla(root)
+    
+    tk.Label(root, text="Top Jugadores", font=("Arial", 16, "bold")).pack(pady=10)
+    
+    ##### Top defensores #####
+    tk.Label(root, text="Top 5 Defensores", font=("Arial", 12, "bold")).pack(pady=5)
+    top_defensores = gestor.obtener_top_defensores()
+    
+    if not top_defensores:
+        tk.Label(root, text="Sin jugadores registrados").pack()
+    else:
+        for i, jugador in enumerate(top_defensores, start=1):
+            texto = f"{i}. {jugador.nombre_usuario} - {jugador.victorias_defensor} victorias"
+            tk.Label(root, text=texto, font=("Arial", 10)).pack(anchor="w", padx=40)
+    tk.Label(root, text="").pack()
+    
+    ##### Top atacantes #####
+    tk.Label(root, text="Top 5 Atacantes", font=("Arial", 16, "bold")).pack(pady=5)
+    top_atacantes = gestor.obtener_top_atacantes()
+    
+    if not top_atacantes:
+        tk.Label(root, text="Sin jugadores registrados").pack()
+    else:
+        for i, jugador in enumerate(top_atacantes, start=1):
+            texto = f"{i}. {jugador.nombre_usuario} - {jugador.victorias_atacante} victorias"
+            tk.Label(root, text=texto, font=("Arial", 10)).pack(anchor="w", padx=40)
+    tk.Label(root, text="").pack()
+    
+    def volver():
+        mostrar_login(root)
+        
+    tk.Button(root, text="Volver", command=volver, width=20).pack(pady=10)
