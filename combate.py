@@ -1,17 +1,20 @@
 from clases import Torre, Unidad, Muro, BaseCentral, DINERO_INICIAL_DEFENSOR, DINERO_INICIAL_ATACANTE, DINERO_POR_RONDA, RONDAS_PARA_GANAR
 
+#CLASE DE ESTADO DEL JUEGO: representa las rondas de la partida
 class EstadoJuego:
     def __init__(self, defensor, atacante):
         self.defensor = defensor
         self.atacante = atacante
-    
+
+        #Dinero inicial
         self.dinero_defensor = DINERO_INICIAL_DEFENSOR
         self.dinero_atacante = DINERO_INICIAL_ATACANTE
 
+        #Valor iniciar de las rondas
         self.rondas_defensor = 0
         self.rondas_atacante = 0
-        self.ronda_actual = 1 #incluir ronda?
-
+        self.ronda_actual = 1 
+    
         self.torres = []
         self.muros = []
         self.unidades = []
@@ -50,12 +53,15 @@ def ejecutar_turno(estado):
         if unidad.esta_destruido():
             continue  # solo ignorar, la limpieza se hace en las torres
         
-        nueva_pos = calcular_movimiento(unidad, estado.mapa)
-        
-        if nueva_pos is not None:
+        for _ in range(unidad.velocidad):
+            nueva_pos = calcular_movimiento(unidad, estado.mapa)
+            if nueva_pos is None:
+                break
             estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None
             unidad.posicion = nueva_pos
             estado.mapa[nueva_pos[0]][nueva_pos[1]] = unidad
+            if nueva_pos == (5, 5):  # llegó a la base, no seguir moviendo
+                break
 
         fila, columna = unidad.posicion
         objetivo = estado.mapa[fila][columna]
@@ -105,6 +111,9 @@ def verificar_fin_ronda(estado):
     if len(unidades_vivas) == 0:
         return "defensor"
     
+    if estado.dinero_atacante <= 0 and len(estado.unidades) == 0:
+        return "defensor"
+
     # la ronda sigue
     return None
 
@@ -127,8 +136,11 @@ def preparar_nueva_ronda(estado):
     estado.ronda_actual += 1
 
 def ejecutar_combate(estado, actualizar_ui=None):
-    
-    while True:
+    MAX_TURNOS = 100
+    turno = 0
+
+    while turno < MAX_TURNOS:
+        turno += 1
         ejecutar_turno(estado)
         
         # actualizar la interfaz si se paso un callback
@@ -139,11 +151,13 @@ def ejecutar_combate(estado, actualizar_ui=None):
         ganador = verificar_fin_ronda(estado)
         
         if ganador is not None:
-            # actualizar marcador
             if ganador == "defensor":
                 estado.rondas_defensor += 1
             else:
                 estado.rondas_atacante += 1
-            
-            return ganador  # retorna quien gano esta ronda
+            return ganador
+
+    # se agotaron los turnos sin ganador, gana el defensor
+    estado.rondas_defensor += 1
+    return "defensor"
 

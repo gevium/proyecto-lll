@@ -8,15 +8,15 @@ DATOS DE LAS ENTIDADES
 '''
 
 TORRES = {
-    "basica": {"nombre": "Torre Basica", "costo": 50, "vida": 80, "dano": 15,"alcance": 2, "habilidad": "disparo_doble", "turnos_habilidad": 3},
-    "pesada": {"nombre": "Torre Pesada", "costo": 120,"vida": 180, "dano": 25,"alcance": 2,"habilidad": "dano_area","turnos_habilidad": 4},
-    "magica": {"nombre": "Torre Magica","costo": 90, "vida": 60,"dano": 10, "alcance": 3,"habilidad": "congelar", "turnos_habilidad": 5}
+    "basica": {"nombre": "Torre Basica", "costo": 50, "vida": 80, "daño": 15,"alcance": 2, "habilidad": "disparo_doble", "turnos_habilidad": 3},
+    "pesada": {"nombre": "Torre Pesada", "costo": 120,"vida": 180, "daño": 25,"alcance": 2,"habilidad": "daño_area","turnos_habilidad": 4},
+    "magica": {"nombre": "Torre Magica","costo": 90, "vida": 60,"daño": 10, "alcance": 3,"habilidad": "congelar", "turnos_habilidad": 5}
 }
  
 UNIDADES = {
-    "soldado": {"nombre": "Soldado", "costo": 40, "vida": 60, "dano": 12, "velocidad": 1, "habilidad": "ataque_doble","turnos_habilidad": 3},
-    "tanque": {"nombre": "Tanque", "costo": 100, "vida": 200, "dano": 20,"velocidad": 1,"habilidad": "escudo_temporal", "turnos_habilidad": 4},
-    "rapida": {"nombre": "Unidad Rapida","costo": 60,"vida": 50,"dano": 8,"velocidad": 2,"habilidad": "aumento_velocidad","turnos_habilidad": 3}
+    "soldado": {"nombre": "Soldado", "costo": 40, "vida": 60, "daño": 12, "velocidad": 1, "habilidad": "ataque_doble","turnos_habilidad": 3},
+    "tanque": {"nombre": "Tanque", "costo": 100, "vida": 200, "daño": 20,"velocidad": 1,"habilidad": "escudo_temporal", "turnos_habilidad": 4},
+    "rapida": {"nombre": "Unidad Rapida","costo": 60,"vida": 50,"daño": 8,"velocidad": 2,"habilidad": "aumento_velocidad","turnos_habilidad": 3}
 }
  
 #FACCIONES
@@ -184,7 +184,7 @@ class Torre (Entidad):
         #DAÑAR AREA
         elif self.habilidad == "daño_area":
             if objetivo is not None and self.posicion is not None: #si el objetivo existe y ya tiene posicion 
-                for unidad in juego.unidades_atacante:
+                for unidad in juego.unidades:
                     if self.en_rango(unidad.posicion[0], unidad.posicion[1]):
                         unidad.recibir_daño(self.daño // 2)
         
@@ -196,7 +196,7 @@ class Torre (Entidad):
 
         #REPARAR
         elif self.habilidad == "reparar":
-            for torre in juego.torres_defensor:
+            for torre in juego.torres:
                 if torre is not self and self.en_rango(*torre.posicion):
                     torre.vida = min(torre.vida_maxima, torre.vida + 20)
 

@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
-from clases import Jugadores_Json
+from clases import Jugadores_Json, Torre, Muro, TORRES, FACCIONES
+from combate import EstadoJuego
 
 gestor = Jugadores_Json()
 
@@ -61,12 +62,14 @@ def mostrar_login(root):
         mostrar_top_jugadores(root)
     tk.Button(root, text="Top Jugadores", command=ir_a_top, width=20).pack(pady=10)
 
-def mostrar_mapa(root, jugador):
+def mostrar_mapa(root, jugador1, jugador2, faccion_defensor):
     limpiar_pantalla(root)
     
     TAMANO_CASILLA = 50  
     FILAS = 11
     COLUMNAS = 11
+
+    estado = EstadoJuego(jugador1, jugador2)
 
     seleccion_actual = [None] 
     
@@ -94,12 +97,34 @@ def mostrar_mapa(root, jugador):
             return
         columna = event.x // TAMANO_CASILLA
         fila = event.y // TAMANO_CASILLA
-        # por ahora solo pinta la casilla
+
+        if (fila, columna) == (5, 5):
+            return
+        if estado.mapa[fila][columna] is not None:
+            return
+
+        tipo = seleccion_actual[0]
+        if tipo == "muro":
+            entidad = Muro(20)
+            estado.muros.append(entidad)
+        else:
+            datos = TORRES[tipo]
+            entidad = Torre(datos["nombre"], datos["costo"], datos["vida"],
+                            datos["daño"], datos["alcance"], datos["habilidad"],
+                            datos["turnos_habilidad"])
+            estado.torres.append(entidad)
+
+        entidad.posicion = (fila, columna)
+        estado.mapa[fila][columna] = entidad
+        estado.dinero_defensor -= entidad.costo
+
         x1 = columna * TAMANO_CASILLA
         y1 = fila * TAMANO_CASILLA
         x2 = x1 + TAMANO_CASILLA
         y2 = y1 + TAMANO_CASILLA
-        canvas.create_rectangle(x1, y1, x2, y2, fill="brown", outline="black")
+        
+        color = FACCIONES[faccion_defensor]["color_muro"] if tipo == "muro" else FACCIONES[faccion_defensor]["color_torre"]
+        canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
 
 
     canvas.bind("<Button-1>", colocar_en_mapa)
