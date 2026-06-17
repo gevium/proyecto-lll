@@ -162,8 +162,9 @@ class Torre (Entidad):
         self.alcance = alcance
         self.habilidad = habilidad
         self.turnos_habilidad = turnos_habilidad
-        self.turnos_restantes = 0  #contador para saber cuando se activa la habilidad
+        self.turnos_restantes = turnos_habilidad  #contador para saber cuando se activa la habilidad
         self.posicion = None  #(fila, columna) en el mapa
+        self.tipo = "torre"
  
     #Verifica si una posicion esta dentro del alcance de la torre
     def en_rango(self, fila_objetivo, columna_objetivo):
@@ -216,11 +217,12 @@ class Unidad(Entidad):
         self.velocidad = velocidad
         self.habilidad = habilidad
         self.turnos_habilidad = turnos_habilidad
-        self.turnos_restantes = 0
+        self.turnos_restantes = turnos_habilidad
         self.posicion = None  #(fila, columna) en el mapa
         self.congelada = False
         self.turnos_congelada = 0
         self.escudo = 0
+        self.tipo = "unidad"
     
     #Mueve la unidad a una nueva posicion si no esta congelada
     def mover(self, destino):
@@ -275,6 +277,7 @@ class Muro(Entidad):
         super().__init__("Muro", vida)
         self.costo = costo
         self.posicion = None
+        self.tipo = "muro"
  
 '''CLASE BASE CENTRAL (entidad)'''
 class BaseCentral(Entidad):
@@ -283,3 +286,4 @@ class BaseCentral(Entidad):
     def __init__(self, vida=200, posicion=(0, 0)):
         super().__init__("Base Central", vida)
         self.posicion = posicion
+        self.tipo = "base"
