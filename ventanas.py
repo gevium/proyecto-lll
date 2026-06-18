@@ -127,12 +127,20 @@ def mostrar_mapa(root, jugador1, jugador2, faccion_defensor, faccion_atacante, e
         tipo = seleccion_actual[0]
         if tipo == "muro":
             entidad = Muro(20)
-            estado.muros.append(entidad)
+            #estado.muros.append(entidad)
         else:
             datos = TORRES[tipo]
             entidad = Torre(datos["nombre"], datos["costo"], datos["vida"],
                             datos["daño"], datos["alcance"], datos["habilidad"],
                             datos["turnos_habilidad"])
+            
+        if estado.dinero_defensor < entidad.costo:
+            messagebox.showwarning("Sin dinero", "No tienes suficiente dinero.")
+            return
+        
+        if tipo == "muro":
+            estado.muros.append(entidad)
+        else:
             estado.torres.append(entidad)
 
         entidad.posicion = (fila, columna)
@@ -147,7 +155,6 @@ def mostrar_mapa(root, jugador1, jugador2, faccion_defensor, faccion_atacante, e
         color = FACCIONES[faccion_defensor]["color_muro"] if tipo == "muro" else FACCIONES[faccion_defensor]["color_torre"]
         canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
         label_dinero.config(text=f"Dinero: ${estado.dinero_defensor}")
-
 
     canvas.bind("<Button-1>", colocar_en_mapa)
     
