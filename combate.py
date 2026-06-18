@@ -86,29 +86,6 @@ def ejecutar_turno(estado):
             estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None
             unidad.posicion = nueva_pos
             estado.mapa[nueva_pos[0]][nueva_pos[1]] = unidad
-        
-        """for _ in range(unidad.velocidad):
-            nueva_pos = calcular_movimiento(unidad, estado.mapa)
-            if nueva_pos is None:
-                break
-            estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None
-            unidad.posicion = nueva_pos
-            estado.mapa[nueva_pos[0]][nueva_pos[1]] = unidad
-            if nueva_pos == (5, 5):  # llegó a la base, no seguir moviendo
-                break
-
-        fila, columna = unidad.posicion
-        objetivo = estado.mapa[fila][columna]
-        
-        if objetivo is not None and objetivo.tipo == "base":
-            objetivo.recibir_daño(unidad.daño)
-            estado.dinero_atacante += 5
-
-        elif objetivo is not None and objetivo.tipo == "muro":
-            objetivo.recibir_daño(unidad.daño)
-            if objetivo.esta_destruido():
-                estado.mapa[fila][columna] = None
-                estado.muros.remove(objetivo)"""
 
     # torres disparan
     for torre in estado.torres:

@@ -36,14 +36,6 @@ def iniciar_sesion(root, entry_user, entry_contra):
         return
     
     confirmacion, jugador = gestor.iniciar_sesion(usuario, contraseña)
-
-    """
-    if confirmacion:
-        messagebox.showinfo("Inicio", "Realizado con éxito")
-        mostrar_mapa(root, jugador)
-    else:
-        messagebox.showwarning("ERROR", "Algo ocurrió mal")
-    """
     
     if not confirmacion:
         messagebox.showwarning("ERROR", "Algo ocurrió mal")
@@ -127,7 +119,6 @@ def mostrar_mapa(root, jugador1, jugador2, faccion_defensor, faccion_atacante, e
         tipo = seleccion_actual[0]
         if tipo == "muro":
             entidad = Muro(20)
-            #estado.muros.append(entidad)
         else:
             datos = TORRES[tipo]
             entidad = Torre(datos["nombre"], datos["costo"], datos["vida"],
@@ -191,7 +182,6 @@ def mostrar_mapa(root, jugador1, jugador2, faccion_defensor, faccion_atacante, e
     y2 = y1 + TAMANO_CASILLA
     canvas.create_rectangle(x1, y1, x2, y2, fill="gold", outline="black")
     canvas.create_text(x1 + 25, y1 + 25, text="BASE", font=("Arial", 7, "bold"))
-    #label_dinero.config(text=f"Dinero: ${estado.dinero_defensor}")
 
 def mostrar_seleccion_faccion(root, jugador1, jugador2):
     limpiar_pantalla(root)
