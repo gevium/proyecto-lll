@@ -82,7 +82,7 @@ def mostrar_login(root):
         mostrar_top_jugadores(root)
     tk.Button(root, text="Top Jugadores", command=ir_a_top, width=20).pack(pady=10)
 
-def mostrar_mapa(root, jugador1, jugador2, faccion_defensor):
+def mostrar_mapa(root, jugador1, jugador2, faccion_defensor, faccion_atacante):
     limpiar_pantalla(root)
     
     TAMANO_CASILLA = 50  
@@ -145,6 +145,7 @@ def mostrar_mapa(root, jugador1, jugador2, faccion_defensor):
         
         color = FACCIONES[faccion_defensor]["color_muro"] if tipo == "muro" else FACCIONES[faccion_defensor]["color_torre"]
         canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
+        label_dinero.config(text=f"Dinero: ${estado.dinero_defensor}")
 
 
     canvas.bind("<Button-1>", colocar_en_mapa)
@@ -159,12 +160,19 @@ def mostrar_mapa(root, jugador1, jugador2, faccion_defensor):
             canvas.create_rectangle(x1, y1, x2, y2, fill="green", outline="black")
     
     # botones en panel_izq
+    label_dinero = tk.Label(panel_izq, text=f"Dinero: ${estado.dinero_defensor}", bg="lightgray", font=("Arial", 10, "bold"))
+    label_dinero.pack(pady=5)
     tk.Label(panel_izq, text="Torres:", bg="lightgray").pack(pady=5)
     tk.Button(panel_izq, text="Basica - $50", command=lambda: cambiar_seleccion("basica")).pack(pady=3)
     tk.Button(panel_izq, text="Pesada - $120", command=lambda: cambiar_seleccion("pesada")).pack(pady=3)
     tk.Button(panel_izq, text="Magica - $90", command=lambda: cambiar_seleccion("magica")).pack(pady=3)
     tk.Label(panel_izq, text="Muros:", bg="lightgray").pack(pady=5)
     tk.Button(panel_izq, text="Muro - $20", command=lambda: cambiar_seleccion("muro")).pack(pady=3)
+    
+    def ir_a_fase_atacante():
+        mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_atacante, estado)
+
+    tk.Button(panel_izq, text="Listo", command=ir_a_fase_atacante, bg="lightgreen", width=15).pack(pady=15)
 
     # dibujar la base central en (5, 5)
     fila_base = 5
@@ -175,6 +183,7 @@ def mostrar_mapa(root, jugador1, jugador2, faccion_defensor):
     y2 = y1 + TAMANO_CASILLA
     canvas.create_rectangle(x1, y1, x2, y2, fill="gold", outline="black")
     canvas.create_text(x1 + 25, y1 + 25, text="BASE", font=("Arial", 7, "bold"))
+    #label_dinero.config(text=f"Dinero: ${estado.dinero_defensor}")
 
 def mostrar_seleccion_faccion(root, jugador1, jugador2):
     limpiar_pantalla(root)
@@ -260,7 +269,7 @@ def mostrar_seleccion_faccion(root, jugador1, jugador2):
     def continuar():
         sesion_actual["jugador1"] = None  # resetear para la próxima partida
         sesion_actual["jugador2"] = None
-        mostrar_mapa(root, jugador1, jugador2, faccion_j1["valor"])
+        mostrar_mapa(root, jugador1, jugador2, faccion_j1["valor"], faccion_j2["valor"])
 
     btn_continuar.config(command=continuar)
 
