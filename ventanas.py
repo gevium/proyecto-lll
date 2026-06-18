@@ -4,6 +4,7 @@ from clases import Jugadores_Json, Torre, Muro, TORRES, FACCIONES
 from combate import EstadoJuego
 
 gestor = Jugadores_Json()
+sesion_actual = {"jugador1": None, "jugador2": None}
 
 #Elimina cualquier widget de la ventana llamada
 def limpiar_pantalla(root):
@@ -36,11 +37,30 @@ def iniciar_sesion(root, entry_user, entry_contra):
     
     confirmacion, jugador = gestor.iniciar_sesion(usuario, contraseña)
 
+    """
     if confirmacion:
         messagebox.showinfo("Inicio", "Realizado con éxito")
         mostrar_mapa(root, jugador)
     else:
         messagebox.showwarning("ERROR", "Algo ocurrió mal")
+    """
+    
+    if not confirmacion:
+        messagebox.showwarning("ERROR", "Algo ocurrió mal")
+        return
+    
+    if sesion_actual["jugador1"] is None:
+        sesion_actual["jugador1"] = jugador
+        messagebox.showinfo("Jugador 1", f"Bienvenido {jugador.nombre_usuario}.\nAhora inicie sesión el jugador 2.")
+        entry_user.delete(0, tk.END)
+        entry_contra.delete(0, tk.END)
+
+    elif sesion_actual["jugador2"] is None:
+        if jugador.nombre_usuario == sesion_actual["jugador1"].nombre_usuario:
+            messagebox.showwarning("Aviso", "El jugador 2 debe ser una cuenta diferente.")
+            return
+        sesion_actual["jugador2"] = jugador
+        mostrar_seleccion_faccion(root, sesion_actual["jugador1"], sesion_actual["jugador2"])
 
 def mostrar_login(root):
     limpiar_pantalla(root)
@@ -155,6 +175,96 @@ def mostrar_mapa(root, jugador1, jugador2, faccion_defensor):
     y2 = y1 + TAMANO_CASILLA
     canvas.create_rectangle(x1, y1, x2, y2, fill="gold", outline="black")
     canvas.create_text(x1 + 25, y1 + 25, text="BASE", font=("Arial", 7, "bold"))
+
+def mostrar_seleccion_faccion(root, jugador1, jugador2):
+    limpiar_pantalla(root)
+    
+    faccion_j1 = {"valor": None}
+    faccion_j2 = {"valor": None}
+    
+    tk.Label(root, text="Selección de facción", font=("Arial", 16, "bold")).pack(pady=10)
+    
+    frame_columnas = tk.Frame(root)
+    frame_columnas.pack(pady=10)
+    
+    #################################
+    # Columna Jugador 1 - Defensor  #
+    #################################
+    
+    frame_j1 = tk.Frame(frame_columnas, bd=2, relief="groove", padx=10, pady=10)
+    frame_j1.grid(row=0, column=0, padx=20)
+
+    tk.Label(frame_j1, text=jugador1.nombre_usuario, font=("Arial", 11, "bold")).pack()
+    tk.Label(frame_j1, text="(Defensor)", font=("Arial", 9, "italic")).pack(pady=2)
+
+    label_seleccion_j1 = tk.Label(frame_j1, text="Sin selección", fg="gray")
+    label_seleccion_j1.pack(pady=5)
+
+    label_aviso = tk.Label(root, text="", fg="red")
+    label_aviso.pack(pady=5)
+
+    btn_continuar = tk.Button(root, text="Continuar", width=20, state="disabled")
+    btn_continuar.pack(pady=10)
+    
+    def verificar_selecciones():
+        if faccion_j1["valor"] is None or faccion_j2["valor"] is None:
+            return
+        if faccion_j1["valor"] == faccion_j2["valor"]:
+            label_aviso.config(text="Las facciones deben ser diferentes.")
+            btn_continuar.config(state="disabled")
+            return
+        label_aviso.config(text="")
+        btn_continuar.config(state="normal")
+        
+    def elegir_j1(clave):
+        faccion_j1["valor"] = clave
+        nombre = FACCIONES[clave]["nombre"]
+        color = FACCIONES[clave]["color_torre"]
+        label_seleccion_j1.config(text=f"✔ {nombre}", fg=color)
+        verificar_selecciones()
+    
+    for clave, datos in FACCIONES.items():
+        def hacer_elegir_j1(c=clave):
+            elegir_j1(c)
+        tk.Button(frame_j1, text=datos["nombre"],
+                 bg=datos["color_torre"], width=15,
+                 command=hacer_elegir_j1).pack(pady=3)
+    
+    #################################
+    # Columna Jugador 2 - Atacante  #
+    #################################
+    frame_j2 = tk.Frame(frame_columnas, bd=2, relief="groove", padx=10, pady=10)
+    frame_j2.grid(row=0, column=1, padx=20)
+
+    tk.Label(frame_j2, text=jugador2.nombre_usuario, font=("Arial", 11, "bold")).pack()
+    tk.Label(frame_j2, text="(Atacante)", font=("Arial", 9, "italic")).pack(pady=2)
+
+    label_seleccion_j2 = tk.Label(frame_j2, text="Sin selección", fg="gray")
+    label_seleccion_j2.pack(pady=5)
+    
+    def elegir_j2(clave):
+        faccion_j2["valor"] = clave
+        nombre = FACCIONES[clave]["nombre"]
+        color = FACCIONES[clave]["color_torre"]
+        label_seleccion_j2.config(text=f"✔ {nombre}", fg=color)
+        verificar_selecciones()
+        
+    for clave, datos in FACCIONES.items():
+        def hacer_elegir_j2(c=clave):
+            elegir_j2(c)
+        tk.Button(frame_j2, text=datos["nombre"],
+                  bg=datos["color_torre"], width=15,
+                  command=hacer_elegir_j2).pack(pady=3)
+    
+    ####### Command del botón continuar #######
+    def continuar():
+        sesion_actual["jugador1"] = None  # resetear para la próxima partida
+        sesion_actual["jugador2"] = None
+        mostrar_mapa(root, jugador1, jugador2, faccion_j1["valor"])
+
+    btn_continuar.config(command=continuar)
+
+        
 
 def mostrar_top_jugadores(root):
     limpiar_pantalla(root)
