@@ -3,12 +3,12 @@
         "nombre_usuario": "Genesis",
         "contraseña": "123123",
         "victorias_defensor": 1,
-        "victorias_atacante": 0
+        "victorias_atacante": 1
     },
     "Amanda": {
         "nombre_usuario": "Amanda",
         "contraseña": "123123",
-        "victorias_defensor": 2,
+        "victorias_defensor": 3,
         "victorias_atacante": 0
     }
 }

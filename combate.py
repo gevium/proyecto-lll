@@ -56,6 +56,40 @@ def ejecutar_turno(estado):
         for _ in range(unidad.velocidad):
             nueva_pos = calcular_movimiento(unidad, estado.mapa)
             if nueva_pos is None:
+                # bloqueada por muro, la unidad ataca el muro
+                fila, columna = unidad.posicion
+                fila_frente = fila
+                col_frente = columna + 1  # el muro está adelante
+                if 0 <= col_frente <= 10 and estado.mapa[fila_frente][col_frente] is not None:
+                    muro = estado.mapa[fila_frente][col_frente]
+                    if muro.tipo == "muro":
+                        muro.recibir_daño(unidad.daño)
+                        if muro.esta_destruido():
+                            estado.mapa[fila_frente][col_frente] = None
+                            if muro in estado.muros:
+                                estado.muros.remove(muro)
+                break
+
+            celda_destino = estado.mapa[nueva_pos[0]][nueva_pos[1]]
+
+            if nueva_pos == (5, 5):
+                # llegó a la base, la ataca sin pisarla
+                estado.base.recibir_daño(unidad.daño)
+                estado.dinero_atacante += 5
+                break
+
+            # si la celda tiene algo que no es la base ni está vacía, detenerse
+            if celda_destino is not None:
+                break
+
+            # moverse normalmente
+            estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None
+            unidad.posicion = nueva_pos
+            estado.mapa[nueva_pos[0]][nueva_pos[1]] = unidad
+        
+        """for _ in range(unidad.velocidad):
+            nueva_pos = calcular_movimiento(unidad, estado.mapa)
+            if nueva_pos is None:
                 break
             estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None
             unidad.posicion = nueva_pos
@@ -74,7 +108,7 @@ def ejecutar_turno(estado):
             objetivo.recibir_daño(unidad.daño)
             if objetivo.esta_destruido():
                 estado.mapa[fila][columna] = None
-                estado.muros.remove(objetivo)
+                estado.muros.remove(objetivo)"""
 
     # torres disparan
     for torre in estado.torres:
