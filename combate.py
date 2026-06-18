@@ -14,15 +14,18 @@ class EstadoJuego:
         self.rondas_defensor = 0
         self.rondas_atacante = 0
         self.ronda_actual = 1 
-    
+
+        #Listas con las entidades correspondientes de la partida
         self.torres = []
         self.muros = []
         self.unidades = []
         self.base = BaseCentral (posicion = (5, 5))
 
+        #Mapa
         self.mapa = [[None for _ in range(11)] for _ in range(11)]
         self.mapa[5][5] = self.base
 
+#funcion que permite determinar la posicion a la que debe ir la unidad del atacante
 def calcular_movimiento(unidad, mapa):
     fila, col = unidad.posicion
     fila_base, col_base = 5, 5
@@ -35,6 +38,7 @@ def calcular_movimiento(unidad, mapa):
     else:
         nueva_fila = fila
 
+    #columnas
     if col < col_base:
         nueva_col = col + 1
     elif col > col_base:
@@ -42,25 +46,26 @@ def calcular_movimiento(unidad, mapa):
     else:
         nueva_col = col
     
-    contenido_celda = mapa[nueva_fila][nueva_col]
+    contenido_celda = mapa[nueva_fila][nueva_col] #se determina que contenido (elemento) hay en la celda
     if contenido_celda is not None and contenido_celda.tipo == "muro":
-        return None  # bloqueada, no puede moverse
-    return (nueva_fila, nueva_col)
+        return None  #se queda bloqueada, no puede moverse
+    return (nueva_fila, nueva_col) #retorna la nueva/proxima posicion
 
+#funcion que permite ejecutar las habilidades de las entidades
 def ejecutar_turno(estado):
 
-    for unidad in estado.unidades:
+    for unidad in estado.unidades: #se buscan las unidades actuales de la ronda
         if unidad.esta_destruido():
-            continue  # solo ignorar, la limpieza se hace en las torres
+            continue  #si ya fue destruida solo se ignora, la limpieza se hace en las torres
         
-        for _ in range(unidad.velocidad):
+        for _ in range(unidad.velocidad): #el for se repite n cantidad de veces (n = velocidad)
             nueva_pos = calcular_movimiento(unidad, estado.mapa)
-            if nueva_pos is None:
+            if nueva_pos is None: #no pudo avanzar, pues hay una entidad bloqueando el paso
                 break
-            estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None
+            estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None #Borra la unidad de su casilla actual en el mapa
             unidad.posicion = nueva_pos
-            estado.mapa[nueva_pos[0]][nueva_pos[1]] = unidad
-            if nueva_pos == (5, 5):  # llegó a la base, no seguir moviendo
+            estado.mapa[nueva_pos[0]][nueva_pos[1]] = unidad #se actualiza la posicion
+            if nueva_pos == (5, 5):  #si llegó a la base, no se sigue moviendo
                 break
 
         fila, columna = unidad.posicion
