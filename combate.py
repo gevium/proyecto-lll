@@ -60,6 +60,7 @@ def ejecutar_turno(estado):
         
         for _ in range(unidad.velocidad): #el for se repite n cantidad de veces (n = velocidad)
             nueva_pos = calcular_movimiento(unidad, estado.mapa)
+<<<<<<< HEAD
             if nueva_pos is None: #no pudo avanzar, pues hay una entidad bloqueando el paso
                 break
             estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None #Borra la unidad de su casilla actual en el mapa
@@ -80,6 +81,39 @@ def ejecutar_turno(estado):
             if objetivo.esta_destruido():
                 estado.mapa[fila][columna] = None
                 estado.muros.remove(objetivo)
+=======
+            if nueva_pos is None:
+                # bloqueada por muro, la unidad ataca el muro
+                fila, columna = unidad.posicion
+                fila_frente = fila
+                col_frente = columna + 1  # el muro está adelante
+                if 0 <= col_frente <= 10 and estado.mapa[fila_frente][col_frente] is not None:
+                    muro = estado.mapa[fila_frente][col_frente]
+                    if muro.tipo == "muro":
+                        muro.recibir_daño(unidad.daño)
+                        if muro.esta_destruido():
+                            estado.mapa[fila_frente][col_frente] = None
+                            if muro in estado.muros:
+                                estado.muros.remove(muro)
+                break
+
+            celda_destino = estado.mapa[nueva_pos[0]][nueva_pos[1]]
+
+            if nueva_pos == (5, 5):
+                # llegó a la base, la ataca sin pisarla
+                estado.base.recibir_daño(unidad.daño)
+                estado.dinero_atacante += 5
+                break
+
+            # si la celda tiene algo que no es la base ni está vacía, detenerse
+            if celda_destino is not None:
+                break
+
+            # moverse normalmente
+            estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None
+            unidad.posicion = nueva_pos
+            estado.mapa[nueva_pos[0]][nueva_pos[1]] = unidad
+>>>>>>> e998c402ce1fa6738f54528beebafcc885ed1ed0
 
     # torres disparan
     for torre in estado.torres:
