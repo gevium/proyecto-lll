@@ -2,7 +2,7 @@
     "Genesis": {
         "nombre_usuario": "Genesis",
         "contraseña": "123123",
-        "victorias_defensor": 0,
+        "victorias_defensor": 1,
         "victorias_atacante": 0
     },
     "Amanda": {
