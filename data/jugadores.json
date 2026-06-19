@@ -2,7 +2,7 @@
     "Genesis": {
         "nombre_usuario": "Genesis",
         "contraseña": "123123",
-        "victorias_defensor": 2,
+        "victorias_defensor": 3,
         "victorias_atacante": 2
     },
     "Amanda": {
@@ -32,6 +32,30 @@
     "Prueba4": {
         "nombre_usuario": "Prueba4",
         "contraseña": "1234mm",
+        "victorias_defensor": 0,
+        "victorias_atacante": 0
+    },
+    "Prueba12": {
+        "nombre_usuario": "Prueba12",
+        "contraseña": "a",
+        "victorias_defensor": 0,
+        "victorias_atacante": 0
+    },
+    "Amanda1": {
+        "nombre_usuario": "Amanda1",
+        "contraseña": "321321",
+        "victorias_defensor": 0,
+        "victorias_atacante": 0
+    },
+    "Prueba1": {
+        "nombre_usuario": "Prueba1",
+        "contraseña": "123",
+        "victorias_defensor": 0,
+        "victorias_atacante": 0
+    },
+    "Prueba 2": {
+        "nombre_usuario": "Prueba 2",
+        "contraseña": "1234",
         "victorias_defensor": 0,
         "victorias_atacante": 0
     }

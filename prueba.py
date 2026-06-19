@@ -45,6 +45,6 @@ for i in range(5):
         break
 
 root = tk.Tk()
-root.geometry("700x600")
+root.geometry("500x600")
 mostrar_mapa(root, j1, j2, "medieval")
 root.mainloop()

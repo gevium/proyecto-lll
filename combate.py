@@ -61,19 +61,24 @@ def ejecutar_turno(estado):
         for _ in range(unidad.velocidad): #el for se repite n cantidad de veces (n = velocidad)
             nueva_pos = calcular_movimiento(unidad, estado.mapa)
             if nueva_pos is None:
-                # bloqueada por muro, la unidad ataca el muro
+                # la unidad no puede moverse, hay un obstaculo adelante
                 fila, columna = unidad.posicion
-                fila_frente = fila
-                col_frente = columna + 1  # el muro está adelante
+                fila_frente = fila  #la fila no cambia, el obstaculo esta en la misma fila
+                col_frente = columna + 1  #el obstaculo esta en la columna siguiente
                 if 0 <= col_frente <= 10 and estado.mapa[fila_frente][col_frente] is not None:
-                    muro = estado.mapa[fila_frente][col_frente]
-                    if muro.tipo == "muro":
-                        muro.recibir_daño(unidad.daño)
-                        if muro.esta_destruido():
+                    #verifica que la columna este dentro del mapa y que haya algo ahi
+                    objetivo = estado.mapa[fila_frente][col_frente]  #obtiene la entidad que esta bloqueando
+                    if objetivo.tipo in ("muro", "torre"):
+                        #solo ataca si el obstaculo es un muro o una torre
+                        objetivo.recibir_daño(unidad.daño)  #la unidad le hace daño al obstaculo
+                        if objetivo.esta_destruido():
+                            #si el obstaculo fue destruido, se limpia del mapa
                             estado.mapa[fila_frente][col_frente] = None
-                            if muro in estado.muros:
-                                estado.muros.remove(muro)
-                break
+                            if objetivo.tipo == "muro" and objetivo in estado.muros:
+                                estado.muros.remove(objetivo)  #se elimina de la lista de muros
+                            elif objetivo.tipo == "torre" and objetivo in estado.torres:
+                                estado.torres.remove(objetivo)  #se elimina de la lista de torres
+                break  #termina el loop de velocidad, la unidad no se mueve este turno
 
             celda_destino = estado.mapa[nueva_pos[0]][nueva_pos[1]]
 
