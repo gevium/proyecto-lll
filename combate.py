@@ -60,28 +60,6 @@ def ejecutar_turno(estado):
         
         for _ in range(unidad.velocidad): #el for se repite n cantidad de veces (n = velocidad)
             nueva_pos = calcular_movimiento(unidad, estado.mapa)
-<<<<<<< HEAD
-            if nueva_pos is None: #no pudo avanzar, pues hay una entidad bloqueando el paso
-                break
-            estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None #Borra la unidad de su casilla actual en el mapa
-            unidad.posicion = nueva_pos
-            estado.mapa[nueva_pos[0]][nueva_pos[1]] = unidad #se actualiza la posicion
-            if nueva_pos == (5, 5):  #si llegó a la base, no se sigue moviendo
-                break
-
-        fila, columna = unidad.posicion
-        objetivo = estado.mapa[fila][columna]
-        
-        if objetivo is not None and objetivo.tipo == "base":
-            objetivo.recibir_daño(unidad.daño)
-            estado.dinero_atacante += 5
-
-        elif objetivo is not None and objetivo.tipo == "muro":
-            objetivo.recibir_daño(unidad.daño)
-            if objetivo.esta_destruido():
-                estado.mapa[fila][columna] = None
-                estado.muros.remove(objetivo)
-=======
             if nueva_pos is None:
                 # bloqueada por muro, la unidad ataca el muro
                 fila, columna = unidad.posicion
@@ -113,7 +91,6 @@ def ejecutar_turno(estado):
             estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None
             unidad.posicion = nueva_pos
             estado.mapa[nueva_pos[0]][nueva_pos[1]] = unidad
->>>>>>> e998c402ce1fa6738f54528beebafcc885ed1ed0
 
     # torres disparan
     for torre in estado.torres:
@@ -173,6 +150,18 @@ def preparar_nueva_ronda(estado):
 
     # avanzar ronda
     estado.ronda_actual += 1
+
+    # limpiar torres
+    for torre in estado.torres:
+        if torre.posicion is not None:
+            estado.mapa[torre.posicion[0]][torre.posicion[1]] = None
+    estado.torres = []
+
+    # limpiar muros
+    for muro in estado.muros:
+        if muro.posicion is not None:
+            estado.mapa[muro.posicion[0]][muro.posicion[1]] = None
+    estado.muros = []
 
 def ejecutar_combate(estado, actualizar_ui=None):
     MAX_TURNOS = 100

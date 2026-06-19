@@ -10,5 +10,29 @@
         "contraseña": "123123",
         "victorias_defensor": 4,
         "victorias_atacante": 0
+    },
+    "Gene2": {
+        "nombre_usuario": "Gene2",
+        "contraseña": "12341234",
+        "victorias_defensor": 0,
+        "victorias_atacante": 0
+    },
+    "prueba1": {
+        "nombre_usuario": "prueba1",
+        "contraseña": "8989",
+        "victorias_defensor": 0,
+        "victorias_atacante": 0
+    },
+    "Nuevo": {
+        "nombre_usuario": "Nuevo",
+        "contraseña": "3241233",
+        "victorias_defensor": 0,
+        "victorias_atacante": 0
+    },
+    "Prueba4": {
+        "nombre_usuario": "Prueba4",
+        "contraseña": "1234mm",
+        "victorias_defensor": 0,
+        "victorias_atacante": 0
     }
 }

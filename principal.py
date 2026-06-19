@@ -4,7 +4,7 @@ from ventanas import mostrar_login
 def iniciar_programa():
     principal = tk.Tk()
     principal.title("Defensa y Asalto de Base")
-    principal.geometry("500x400")
+    principal.geometry("900x650")
 
     mostrar_login(principal)
 

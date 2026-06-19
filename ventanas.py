@@ -6,6 +6,16 @@ from combate import EstadoJuego, ejecutar_combate
 gestor = Jugadores_Json()
 sesion_actual = {"jugador1": None, "jugador2": None}
 
+# Paleta de colores general
+COLOR_FONDO = "#F0F4F8"
+COLOR_PANEL = "#D9E2EC"
+COLOR_BOTON = "#4A90D9"
+COLOR_BOTON_TEXTO = "white"
+COLOR_TITULO = "#1A2E4A"
+FUENTE_TITULO = ("Georgia", 16, "bold")
+FUENTE_NORMAL = ("Arial", 10)
+FUENTE_BOTON = ("Arial", 10, "bold")
+
 #Elimina cualquier widget de la ventana llamada
 def limpiar_pantalla(root):
     for widget in root.winfo_children():
@@ -56,23 +66,55 @@ def iniciar_sesion(root, entry_user, entry_contra):
 
 def mostrar_login(root):
     limpiar_pantalla(root)
+    sesion_actual["jugador1"] = None
+    sesion_actual["jugador2"] = None
 
-    tk.Label(root, text= "Bienvenido a: Defensa y Asalto de Base").pack(pady=10, anchor="w")
+    root.configure(bg=COLOR_FONDO)
 
-    tk.Label(root, text= "Escriba el nombre de usuario:").pack(pady=10, anchor="w")
-    entry_user = tk.Entry(root)
-    entry_user.pack(pady =5, anchor= "w")
+    tk.Label(root, text="⚔ Defensa y Asalto de Base", font=FUENTE_TITULO,
+             bg=COLOR_FONDO, fg=COLOR_TITULO).pack(pady=30)
 
-    tk.Label(root, text= "Escriba su contraseña:").pack(pady=10, anchor="w")
-    entry_contra = tk.Entry(root)
-    entry_contra.pack(pady =5, anchor= "w")
+    frame = tk.Frame(root, bg=COLOR_PANEL, padx=30, pady=30)
+    frame.pack(pady=10)
 
-    tk.Button(root, text = "Iniciar sesión", command=lambda: iniciar_sesion(root,entry_user, entry_contra), width=20).pack(pady=10)
-    tk.Button(root, text = "Registrarse", command=lambda: registrar(entry_user, entry_contra), width=20).pack(pady=10)
-    
-    def ir_a_top():
-        mostrar_top_jugadores(root)
-    tk.Button(root, text="Top Jugadores", command=ir_a_top, width=20).pack(pady=10)
+    tk.Label(frame, text="Usuario:", font=FUENTE_NORMAL, bg=COLOR_PANEL).pack(anchor="w")
+    entry_user = tk.Entry(frame, font=FUENTE_NORMAL, width=25)
+    entry_user.pack(pady=5)
+
+    tk.Label(frame, text="Contraseña:", font=FUENTE_NORMAL, bg=COLOR_PANEL).pack(anchor="w", pady=(10,0))
+    entry_contra = tk.Entry(frame, font=FUENTE_NORMAL, width=25, show="*")
+    entry_contra.pack(pady=5)
+
+    tk.Button(frame, text="Iniciar sesión", font=FUENTE_BOTON,
+              bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, width=20,
+              command=lambda: iniciar_sesion(root, entry_user, entry_contra)).pack(pady=(15,5))
+    tk.Button(frame, text="Registrarse", font=FUENTE_BOTON,
+              bg=COLOR_PANEL, width=20,
+              command=lambda: registrar(entry_user, entry_contra)).pack(pady=5)
+    tk.Button(frame, text="Top Jugadores", font=FUENTE_BOTON,
+              bg=COLOR_PANEL, width=20,
+              command=lambda: mostrar_top_jugadores(root)).pack(pady=5)
+
+def redibujar_mapa(canvas, FILAS, COLUMNAS, TAMANO_CASILLA,estado,faccion_defensor):
+    canvas.delete("all")
+    for fila in range(FILAS):
+        for columna in range(COLUMNAS):
+            x1 = columna * TAMANO_CASILLA
+            y1 = fila * TAMANO_CASILLA
+            x2 = x1 + TAMANO_CASILLA
+            y2 = y1 + TAMANO_CASILLA
+            entidad = estado.mapa[fila][columna]
+            if entidad is None:
+                canvas.create_rectangle(x1, y1, x2, y2, fill="green", outline="black")
+            elif entidad.tipo == "base":
+                canvas.create_rectangle(x1, y1, x2, y2, fill="gold", outline="black")
+                canvas.create_text(x1 + 25, y1 + 25, text="BASE", font=("Arial", 7, "bold"))
+            elif entidad.tipo == "torre":
+                canvas.create_rectangle(x1, y1, x2, y2, fill=FACCIONES[faccion_defensor]["color_torre"], outline="black")
+            elif entidad.tipo == "muro":
+                canvas.create_rectangle(x1, y1, x2, y2, fill=FACCIONES[faccion_defensor]["color_muro"], outline="black")
+
+
 
 def mostrar_mapa(root, jugador1, jugador2, faccion_defensor, faccion_atacante, estado=None):
     limpiar_pantalla(root)
@@ -85,6 +127,8 @@ def mostrar_mapa(root, jugador1, jugador2, faccion_defensor, faccion_atacante, e
         estado = EstadoJuego(jugador1, jugador2)
 
     seleccion_actual = [None] 
+    def ir_a_fase_atacante():
+        mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_atacante, estado)
     
     frame_principal = tk.Frame(root)
     frame_principal.pack(fill="both", expand=True)
@@ -98,6 +142,45 @@ def mostrar_mapa(root, jugador1, jugador2, faccion_defensor, faccion_atacante, e
     panel_der = tk.Frame(frame_principal, width=150, bg="lightgray")
     panel_der.pack(side="left", fill="y")
 
+    panel_izq.configure(bg=COLOR_PANEL)
+    panel_der.configure(bg=COLOR_PANEL)
+
+    tk.Label(panel_izq, text=jugador1.nombre_usuario, font=("Arial", 11, "bold"),
+            bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(15,0))
+    tk.Label(panel_izq, text="(Defensor)", font=("Arial", 9, "italic"),
+            bg=COLOR_PANEL, fg="gray").pack()
+
+    label_dinero = tk.Label(panel_izq, text=f"💰 ${estado.dinero_defensor}",
+                            font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO)
+    label_dinero.pack(pady=10)
+
+    tk.Label(panel_izq, text="Torres", font=FUENTE_BOTON,
+            bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(10,2))
+    tk.Button(panel_izq, text="Básica - $50", font=FUENTE_NORMAL,
+            bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, width=15,
+            command=lambda: cambiar_seleccion("basica")).pack(pady=3)
+    tk.Button(panel_izq, text="Pesada - $120", font=FUENTE_NORMAL,
+            bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, width=15,
+            command=lambda: cambiar_seleccion("pesada")).pack(pady=3)
+    tk.Button(panel_izq, text="Mágica - $90", font=FUENTE_NORMAL,
+            bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, width=15,
+            command=lambda: cambiar_seleccion("magica")).pack(pady=3)
+
+    tk.Label(panel_izq, text="Muros", font=FUENTE_BOTON,
+            bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(10,2))
+    tk.Button(panel_izq, text="Muro - $20", font=FUENTE_NORMAL,
+            bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, width=15,
+            command=lambda: cambiar_seleccion("muro")).pack(pady=3)
+
+    tk.Button(panel_izq, text="✔ Listo", font=FUENTE_BOTON,
+            bg="green", fg="white", width=15,
+            command=ir_a_fase_atacante).pack(pady=20)
+    
+    tk.Label(panel_der, text="Turno", font=FUENTE_BOTON,
+         bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(15,2))
+    label_turno = tk.Label(panel_der, text="—", font=("Arial", 14, "bold"),
+                        bg=COLOR_PANEL, fg=COLOR_TITULO)
+    label_turno.pack()
     canvas = tk.Canvas(panel_centro, width=COLUMNAS * TAMANO_CASILLA, height=FILAS * TAMANO_CASILLA)
     canvas.pack()
 
@@ -124,11 +207,11 @@ def mostrar_mapa(root, jugador1, jugador2, faccion_defensor, faccion_atacante, e
             entidad = Torre(datos["nombre"], datos["costo"], datos["vida"],
                             datos["daño"], datos["alcance"], datos["habilidad"],
                             datos["turnos_habilidad"])
-            
+
         if estado.dinero_defensor < entidad.costo:
             messagebox.showwarning("Sin dinero", "No tienes suficiente dinero.")
             return
-        
+
         if tipo == "muro":
             estado.muros.append(entidad)
         else:
@@ -137,15 +220,9 @@ def mostrar_mapa(root, jugador1, jugador2, faccion_defensor, faccion_atacante, e
         entidad.posicion = (fila, columna)
         estado.mapa[fila][columna] = entidad
         estado.dinero_defensor -= entidad.costo
-
-        x1 = columna * TAMANO_CASILLA
-        y1 = fila * TAMANO_CASILLA
-        x2 = x1 + TAMANO_CASILLA
-        y2 = y1 + TAMANO_CASILLA
-        
-        color = FACCIONES[faccion_defensor]["color_muro"] if tipo == "muro" else FACCIONES[faccion_defensor]["color_torre"]
-        canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
         label_dinero.config(text=f"Dinero: ${estado.dinero_defensor}")
+        redibujar_mapa(canvas, FILAS, COLUMNAS, TAMANO_CASILLA, estado, faccion_defensor)
+
 
     canvas.bind("<Button-1>", colocar_en_mapa)
     
@@ -157,31 +234,6 @@ def mostrar_mapa(root, jugador1, jugador2, faccion_defensor, faccion_atacante, e
             x2 = x1 + TAMANO_CASILLA
             y2 = y1 + TAMANO_CASILLA
             canvas.create_rectangle(x1, y1, x2, y2, fill="green", outline="black")
-    
-    # botones en panel_izq
-    label_dinero = tk.Label(panel_izq, text=f"Dinero: ${estado.dinero_defensor}", bg="lightgray", font=("Arial", 10, "bold"))
-    label_dinero.pack(pady=5)
-    tk.Label(panel_izq, text="Torres:", bg="lightgray").pack(pady=5)
-    tk.Button(panel_izq, text="Basica - $50", command=lambda: cambiar_seleccion("basica")).pack(pady=3)
-    tk.Button(panel_izq, text="Pesada - $120", command=lambda: cambiar_seleccion("pesada")).pack(pady=3)
-    tk.Button(panel_izq, text="Magica - $90", command=lambda: cambiar_seleccion("magica")).pack(pady=3)
-    tk.Label(panel_izq, text="Muros:", bg="lightgray").pack(pady=5)
-    tk.Button(panel_izq, text="Muro - $20", command=lambda: cambiar_seleccion("muro")).pack(pady=3)
-    
-    def ir_a_fase_atacante():
-        mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_atacante, estado)
-
-    tk.Button(panel_izq, text="Listo", command=ir_a_fase_atacante, bg="lightgreen", width=15).pack(pady=15)
-
-    # dibujar la base central en (5, 5)
-    fila_base = 5
-    columna_base = 5
-    x1 = columna_base * TAMANO_CASILLA
-    y1 = fila_base * TAMANO_CASILLA
-    x2 = x1 + TAMANO_CASILLA
-    y2 = y1 + TAMANO_CASILLA
-    canvas.create_rectangle(x1, y1, x2, y2, fill="gold", outline="black")
-    canvas.create_text(x1 + 25, y1 + 25, text="BASE", font=("Arial", 7, "bold"))
 
 def mostrar_seleccion_faccion(root, jugador1, jugador2):
     limpiar_pantalla(root)
@@ -299,40 +351,6 @@ def mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_at
     def cambiar_seleccion(tipo):
         seleccion_actual[0] = tipo
 
-    def redibujar_mapa():
-        canvas.delete("all")
-        # fondo verde
-        for fila in range(FILAS):
-            for columna in range(COLUMNAS):
-                x1 = columna * TAMANO_CASILLA
-                y1 = fila * TAMANO_CASILLA
-                x2 = x1 + TAMANO_CASILLA
-                y2 = y1 + TAMANO_CASILLA
-                canvas.create_rectangle(x1, y1, x2, y2, fill="green", outline="black")
-
-        # redibujar lo que ya está en el mapa
-        for fila in range(FILAS):
-            for columna in range(COLUMNAS):
-                entidad = estado.mapa[fila][columna]
-                if entidad is None:
-                    continue
-                x1 = columna * TAMANO_CASILLA
-                y1 = fila * TAMANO_CASILLA
-                x2 = x1 + TAMANO_CASILLA
-                y2 = y1 + TAMANO_CASILLA
-                if entidad.tipo == "base":
-                    canvas.create_rectangle(x1, y1, x2, y2, fill="gold", outline="black")
-                    canvas.create_text(x1 + 25, y1 + 25, text="BASE", font=("Arial", 7, "bold"))
-                elif entidad.tipo == "torre":
-                    color = FACCIONES[faccion_defensor]["color_torre"]
-                    canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
-                elif entidad.tipo == "muro":
-                    color = FACCIONES[faccion_defensor]["color_muro"]
-                    canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
-                elif entidad.tipo == "unidad":
-                    color = FACCIONES[faccion_atacante]["color_unidad"]
-                    canvas.create_oval(x1 + 5, y1 + 5, x2 - 5, y2 - 5, fill=color, outline="black")
-
     def colocar_unidad(event):
         if seleccion_actual[0] is None:
             return
@@ -364,7 +382,7 @@ def mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_at
         estado.dinero_atacante -= datos["costo"]
 
         label_dinero.config(text=f"Dinero: ${estado.dinero_atacante}")
-        redibujar_mapa()
+        redibujar_mapa(canvas, FILAS, COLUMNAS, TAMANO_CASILLA, estado, faccion_defensor)
 
     canvas.bind("<Button-1>", colocar_unidad)
     
@@ -389,7 +407,7 @@ def mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_at
             return
 
         def actualizar_ui():
-            redibujar_mapa()
+            redibujar_mapa(canvas, FILAS, COLUMNAS, TAMANO_CASILLA, estado, faccion_defensor)
             root.update()
 
         ganador = ejecutar_combate(estado, actualizar_ui)
@@ -399,7 +417,7 @@ def mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_at
               bg="salmon", width=15).pack(pady=15)
     
     #### Dibujar mapa inicial con lo que pone el defensor ####
-    redibujar_mapa()
+    redibujar_mapa(canvas, FILAS, COLUMNAS, TAMANO_CASILLA, estado, faccion_defensor)
  
 def mostrar_resultado_ronda(root, jugador1, jugador2, faccion_defensor, faccion_atacante, estado, ganador):
     limpiar_pantalla(root)
@@ -445,7 +463,6 @@ def mostrar_resultado_ronda(root, jugador1, jugador2, faccion_defensor, faccion_
         tk.Label(root, text=f"Ronda {estado.ronda_actual}", font=("Arial", 10, "italic"), fg="gray").pack(pady=5)
         tk.Button(root, text="Siguiente ronda", command=siguiente_ronda,
                   bg="lightgreen", width=20).pack(pady=20)
-
 
 def mostrar_ganador_partida(root, jugador1, jugador2, ganador):
     limpiar_pantalla(root)
