@@ -3,10 +3,9 @@ import os as os #permite manejar el sistema de archivos
 
 '''
 ########################################################################
-DATOS DE LAS ENTIDADES
+DATOS DE LAS ENTIDADES (CONSTANTES)
 ########################################################################
 '''
-
 TORRES = {
     "basica": {"nombre": "Torre Basica", "costo": 50, "vida": 80, "daño": 15,"alcance": 2, "habilidad": "disparo_doble", "turnos_habilidad": 3},
     "pesada": {"nombre": "Torre Pesada", "costo": 120,"vida": 180, "daño": 25,"alcance": 2,"habilidad": "daño_area","turnos_habilidad": 4},
@@ -14,9 +13,9 @@ TORRES = {
 }
  
 UNIDADES = {
-    "soldado": {"nombre": "Soldado", "costo": 40, "vida": 60, "daño": 12, "velocidad": 1, "habilidad": "ataque_doble","turnos_habilidad": 3},
-    "tanque": {"nombre": "Tanque", "costo": 100, "vida": 200, "daño": 20,"velocidad": 1,"habilidad": "escudo_temporal", "turnos_habilidad": 4},
-    "rapida": {"nombre": "Unidad Rapida","costo": 60,"vida": 50,"daño": 8,"velocidad": 2,"habilidad": "aumento_velocidad","turnos_habilidad": 3}
+    "soldado": {"nombre": "Soldado", "costo": 40, "vida": 60, "daño": 18, "velocidad": 1, "habilidad": "ataque_doble","turnos_habilidad": 3},
+    "tanque": {"nombre": "Tanque", "costo": 100, "vida": 200, "daño": 28,"velocidad": 1,"habilidad": "escudo_temporal", "turnos_habilidad": 4},
+    "rapida": {"nombre": "Unidad Rapida","costo": 60,"vida": 50,"daño": 12,"velocidad": 2,"habilidad": "aumento_velocidad","turnos_habilidad": 3}
 }
  
 #FACCIONES
@@ -34,7 +33,6 @@ DINERO_POR_RONDA = 50
 TAMANO_MAPA = 10  #cuadricula 10x10
 VIDA_BASE_CENTRAL = 200
 RONDAS_PARA_GANAR = 3
-
 
 RUTA_ARCHIVO = os.path.join("data", "jugadores.json") #ruta hacia el archivo de jugadores
 

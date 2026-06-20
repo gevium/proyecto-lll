@@ -1,6 +1,12 @@
 from clases import Torre, Unidad, Muro, BaseCentral, DINERO_INICIAL_DEFENSOR, DINERO_INICIAL_ATACANTE, DINERO_POR_RONDA, RONDAS_PARA_GANAR
 
-#CLASE DE ESTADO DEL JUEGO: representa las rondas de la partida
+'''
+########################################################################
+CLASE: Estado juego
+########################################################################
+'''
+
+#Guarda la posicion de todas las unidades y entidades, dinero y gestiona rondas
 class EstadoJuego:
     def __init__(self, defensor, atacante):
         self.defensor = defensor
@@ -26,27 +32,31 @@ class EstadoJuego:
         self.mapa[5][5] = self.base
 
 #funcion que permite determinar la posicion a la que debe ir la unidad del atacante
+#para acercarse a una linea vertical u horizontal que lo lleve a  la base
 def calcular_movimiento(unidad, mapa):
     fila, col = unidad.posicion
     fila_base, col_base = 5, 5
 
-    #calcula hacia donde moverse (un paso hacia la base)
-    if fila < fila_base:
-        nueva_fila = fila + 1
-    elif fila > fila_base:
-        nueva_fila = fila - 1
-    else:
-        nueva_fila = fila
+    #si ya esta en la base, no se mueve
+    if fila == fila_base and col == col_base:
+        return None
 
-    #columnas
-    if col < col_base:
-        nueva_col = col + 1
-    elif col > col_base:
-        nueva_col = col - 1
+    #Primero intenta moverse en columna, luego en fila
+    if col != col_base:
+        nueva_fila = fila
+        nueva_col = col + 1 if col < col_base else col - 1
     else:
         nueva_col = col
-    
+        nueva_fila = fila + 1 if fila < fila_base else fila - 1
+
+    contenido_celda = mapa[nueva_fila][nueva_col]
+    if contenido_celda is not None and contenido_celda.tipo == "muro":
+        return None
+    return (nueva_fila, nueva_col)
+        
     contenido_celda = mapa[nueva_fila][nueva_col] #se determina que contenido (elemento) hay en la celda
+    
+    #Si no está vacío o hay un muro
     if contenido_celda is not None and contenido_celda.tipo == "muro":
         return None  #se queda bloqueada, no puede moverse
     return (nueva_fila, nueva_col) #retorna la nueva/proxima posicion
@@ -61,25 +71,27 @@ def ejecutar_turno(estado):
         for _ in range(unidad.velocidad): #el for se repite n cantidad de veces (n = velocidad)
             nueva_pos = calcular_movimiento(unidad, estado.mapa)
             if nueva_pos is None:
-                # la unidad no puede moverse, hay un obstaculo adelante
                 fila, columna = unidad.posicion
-                fila_frente = fila  #la fila no cambia, el obstaculo esta en la misma fila
-                col_frente = columna + 1  #el obstaculo esta en la columna siguiente
-                if 0 <= col_frente <= 10 and estado.mapa[fila_frente][col_frente] is not None:
-                    #verifica que la columna este dentro del mapa y que haya algo ahi
-                    objetivo = estado.mapa[fila_frente][col_frente]  #obtiene la entidad que esta bloqueando
-                    if objetivo.tipo in ("muro", "torre"):
-                        #solo ataca si el obstaculo es un muro o una torre
-                        objetivo.recibir_daño(unidad.daño)  #la unidad le hace daño al obstaculo
+                #calcula la direccion del obstaculo igual que calcular_movimiento
+                if columna != 5:
+                    fila_frente = fila
+                    col_frente = columna + 1 if columna < 5 else columna - 1
+                else:
+                    col_frente = columna
+                    fila_frente = fila + 1 if fila < 5 else fila - 1
+
+                if 0 <= col_frente <= 10 and 0 <= fila_frente <= 10:
+                    objetivo = estado.mapa[fila_frente][col_frente]
+                    if objetivo is not None and objetivo.tipo in ("muro", "torre"):
+                        objetivo.recibir_daño(unidad.daño)
                         if objetivo.esta_destruido():
-                            #si el obstaculo fue destruido, se limpia del mapa
                             estado.mapa[fila_frente][col_frente] = None
                             if objetivo.tipo == "muro" and objetivo in estado.muros:
-                                estado.muros.remove(objetivo)  #se elimina de la lista de muros
+                                estado.muros.remove(objetivo)
                             elif objetivo.tipo == "torre" and objetivo in estado.torres:
-                                estado.torres.remove(objetivo)  #se elimina de la lista de torres
-                break  #termina el loop de velocidad, la unidad no se mueve este turno
-
+                                estado.torres.remove(objetivo)
+                break
+            
             celda_destino = estado.mapa[nueva_pos[0]][nueva_pos[1]]
 
             if nueva_pos == (5, 5):
@@ -90,7 +102,16 @@ def ejecutar_turno(estado):
 
             # si la celda tiene algo que no es la base ni está vacía, detenerse
             if celda_destino is not None:
+                if celda_destino.tipo in ("muro", "torre"):
+                    celda_destino.recibir_daño(unidad.daño)
+                    if celda_destino.esta_destruido():
+                        estado.mapa[nueva_pos[0]][nueva_pos[1]] = None
+                        if celda_destino.tipo == "muro" and celda_destino in estado.muros:
+                            estado.muros.remove(celda_destino)
+                        elif celda_destino.tipo == "torre" and celda_destino in estado.torres:
+                            estado.torres.remove(celda_destino)
                 break
+
 
             # moverse normalmente
             estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None

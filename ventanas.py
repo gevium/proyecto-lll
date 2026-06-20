@@ -121,20 +121,16 @@ def mostrar_login(root):
     entry_contra = tk.Entry(frame, font=FUENTE_NORMAL, width=25, show="*")
     entry_contra.pack(pady=5)
 
-    tk.Button(frame, text="Iniciar sesión", font=FUENTE_BOTON, bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, width=20, 
-              command=lambda: iniciar_sesion(root, entry_user, entry_contra, label_estado, btn_comenzar)).pack(pady=(15,5))
-    tk.Button(frame, text="Registrarse", font=FUENTE_BOTON, bg=COLOR_PANEL, width=20,
-              command=lambda: registrar(entry_user, entry_contra)).pack(pady=5)
+    tk.Button(frame, text="Iniciar sesión", font=FUENTE_BOTON, bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, width=20,  command=lambda: iniciar_sesion(root, entry_user, entry_contra, label_estado, btn_comenzar)).pack(pady=(15,5))
+    tk.Button(frame, text="Registrarse", font=FUENTE_BOTON, bg=COLOR_PANEL, width=20, command=lambda: registrar(entry_user, entry_contra)).pack(pady=5)
     
     label_estado = tk.Label(frame, text="Esperando jugador 1...", font=FUENTE_NORMAL, bg=COLOR_PANEL, fg="gray")
     label_estado.pack(pady=5)
 
-    btn_comenzar = tk.Button(frame, text="⚔ Comenzar partida", font=FUENTE_BOTON, bg="green", fg="white", width=20, state="disabled",
-                            command=lambda: mostrar_seleccion_faccion(root, sesion_actual["jugador1"], sesion_actual["jugador2"]))
+    btn_comenzar = tk.Button(frame, text="⚔ Comenzar partida", font=FUENTE_BOTON, bg="green", fg="white", width=20, state="disabled", command=lambda: mostrar_seleccion_faccion(root, sesion_actual["jugador1"], sesion_actual["jugador2"]))
     btn_comenzar.pack(pady=5)
 
-    tk.Button(frame, text="Top Jugadores", font=FUENTE_BOTON, bg=COLOR_PANEL, width=20,
-              command=lambda: mostrar_top_jugadores(root)).pack(pady=5)
+    tk.Button(frame, text="Top Jugadores", font=FUENTE_BOTON, bg=COLOR_PANEL, width=20, command=lambda: mostrar_top_jugadores(root)).pack(pady=5)
 
 '''
 ##############################################################################
@@ -378,7 +374,7 @@ def mostrar_seleccion_faccion(root, jugador1, jugador2):
 '''
 ##############################################################################
 FIG
-4. Mostrar el panel/seleccion del defensor + Inicio de combate
+4. Mostrar el panel/seleccion del atacante + Inicio de combate
 ##############################################################################
 '''
 #Despliega la interfaz del atacante
@@ -401,6 +397,12 @@ def mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_at
 
     panel_centro = tk.Frame(frame_principal)
     panel_centro.pack(side="left")
+
+    #se crea el panel derecho con ancho fijo y color de fondo
+    panel_der = tk.Frame(frame_principal, width=200, bg=COLOR_PANEL)
+    panel_der.pack(side="left", fill="y")
+    panel_der.pack_propagate(False) #evita que el frame se encoja según su contenido
+
 
     #se vuelve a dibujar el canvas
     canvas = tk.Canvas(panel_centro, width=COLUMNAS * TAMANO_CASILLA, height=FILAS * TAMANO_CASILLA)
@@ -464,6 +466,26 @@ def mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_at
 
     tk.Label(panel_izq, text="Unidades", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(10,2))
 
+
+
+    #titulo del panel
+    tk.Label(panel_der, text="Estado de batalla", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(15,5))
+
+    #seccion de la base
+    tk.Label(panel_der, text="🏰 Base", font=FUENTE_BOTON,bg=COLOR_PANEL, fg=COLOR_TITULO).pack(anchor="w", padx=10)
+    label_base = tk.Label(panel_der, text=f"Vida: {estado.base.vida}", font=FUENTE_NORMAL, bg=COLOR_PANEL)
+    label_base.pack(anchor="w", padx=20) #se muestra la vida inicial de la base
+
+    #seccion de torres — el frame_torres se limpia y redibuja en cada turno
+    tk.Label(panel_der, text="🗼 Torres", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO).pack(anchor="w", padx=10, pady=(10,0))
+    frame_torres = tk.Frame(panel_der, bg=COLOR_PANEL)
+    frame_torres.pack(fill="x") #contenedor donde se van a poner los labels de cada torre
+
+    #seccion de unidades — igual que torres, se limpia y redibuja en cada turno
+    tk.Label(panel_der, text="⚔ Unidades", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO).pack(anchor="w", padx=10, pady=(10,0))
+    frame_unidades = tk.Frame(panel_der, bg=COLOR_PANEL)
+    frame_unidades.pack(fill="x") #contenedor donde se van a poner los labels de cada unidad    
+
     #Inicia el combate (animación)
     def iniciar_combate():
         
@@ -472,10 +494,33 @@ def mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_at
             return
         
         def actualizar_ui(): #Se actualiza la matriz para mostrar el combate
-            redibujar_mapa(canvas, FILAS, COLUMNAS, TAMANO_CASILLA, estado, faccion_defensor, faccion_atacante)            
-            root.update()
-            root.after(300)  # 300ms entre cada turno, podés ajustarlo
-        
+            try:
+                #redibuja el canvas con el estado actual del mapa
+                redibujar_mapa(canvas, FILAS, COLUMNAS, TAMANO_CASILLA, estado, faccion_defensor, faccion_atacante)
+
+                #actualiza el label de vida de la base
+                label_base.config(text=f"Vida: {estado.base.vida}/{estado.base.vida_maxima}")
+
+                #limpia los labels viejos de torres y crea uno nuevo por cada torre viva
+                for widget in frame_torres.winfo_children():
+                    widget.destroy() #elimina el label del turno anterior
+                for torre in estado.torres:
+                    tk.Label(frame_torres, text=f"{torre.nombre}: {torre.vida}/{torre.vida_maxima}", font=FUENTE_NORMAL, bg=COLOR_PANEL).pack(anchor="w", padx=20)
+
+                #limpia los labels viejos de unidades y crea uno nuevo por cada unidad viva
+                for widget in frame_unidades.winfo_children():
+                    widget.destroy() #elimina el label del turno anterior
+
+                for unidad in estado.unidades:
+                    tk.Label(frame_unidades, text=f"{unidad.nombre}: {unidad.vida}/{unidad.vida_maxima}", font=FUENTE_NORMAL, bg=COLOR_PANEL).pack(anchor="w", padx=20)
+
+                root.update() #fuerza a tkinter a redibujar la ventana
+                root.after(600) #espera 300ms antes del siguiente turno
+
+            except Exception:
+                pass #si el canvas fue destruido, ignora el error
+
+
         #ejecutar_combater (de combate.py)
         ganador = ejecutar_combate(estado, actualizar_ui)
         mostrar_resultado_ronda(root, jugador1, jugador2, faccion_defensor, faccion_atacante, estado, ganador)
