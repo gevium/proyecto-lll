@@ -243,7 +243,7 @@ def mostrar_mapa_y_defensor(root, jugador1, jugador2, faccion_defensor, faccion_
     frame_principal = tk.Frame(root)
     frame_principal.pack(fill="both", expand=True)
 
-    panel_izq = tk.Frame(frame_principal, width=200, bg="lightgray")
+    panel_izq = tk.Frame(frame_principal, width=200, bg="#94A4B2")
     panel_izq.pack(side="left", fill="y")
     panel_izq.pack_propagate(False)
 
@@ -253,7 +253,7 @@ def mostrar_mapa_y_defensor(root, jugador1, jugador2, faccion_defensor, faccion_
     panel_izq.configure(bg=COLOR_PANEL)
 
     tk.Label(panel_izq, text=jugador1.nombre_usuario, font=("Arial", 11, "bold"), bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(15,0))
-    tk.Label(panel_izq, text="(Defensor)", font=("Arial", 9, "italic"), bg=COLOR_PANEL, fg="gray").pack()
+    tk.Label(panel_izq, text="(Defensor)", font=("Arial", 9, "italic"), bg=COLOR_PANEL, fg=COLOR_TITULO).pack()
 
     label_dinero = tk.Label(panel_izq, text=f"${estado.dinero_defensor}", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO)
     label_dinero.pack(pady=10)
@@ -357,7 +357,7 @@ def mostrar_seleccion_faccion(root, jugador1, jugador2):
 
     tk.Label(frame_j1, text=jugador1.nombre_usuario, font=("Arial", 11, "bold"), bg=COLOR_PANEL, fg=COLOR_TITULO).pack()
     tk.Label(frame_j1, text="(Defensor)", font=("Arial", 9, "italic"),bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=2)
-    label_seleccion_j1 = tk.Label(frame_j1, text="Sin selección",font=FUENTE_NORMAL, bg=COLOR_PANEL, fg="gray")
+    label_seleccion_j1 = tk.Label(frame_j1, text="Sin selección",font=FUENTE_NORMAL, bg=COLOR_PANEL, fg="#94A4B2")
     label_seleccion_j1.pack(pady=5)
 
     #JUGADOR 2 - FACCIONES
@@ -365,7 +365,7 @@ def mostrar_seleccion_faccion(root, jugador1, jugador2):
     frame_j2.grid(row=0, column=1, padx=20)
 
     tk.Label(frame_j2, text=jugador2.nombre_usuario, font=("Arial", 11, "bold"), bg=COLOR_PANEL, fg=COLOR_TITULO).pack()
-    tk.Label(frame_j2, text="(Atacante)", font=("Arial", 9, "italic"), bg=COLOR_PANEL, ffg=COLOR_TITULO).pack(pady=2)
+    tk.Label(frame_j2, text="(Atacante)", font=("Arial", 9, "italic"), bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=2)
     label_seleccion_j2 = tk.Label(frame_j2, text="Sin selección", font=FUENTE_NORMAL, bg=COLOR_PANEL, fg=COLOR_BOTON_TEXTO)
     label_seleccion_j2.pack(pady=5)
 
@@ -391,8 +391,7 @@ def mostrar_seleccion_faccion(root, jugador1, jugador2):
     def elegir_j1(clave):
         faccion_j1["valor"] = clave
         nombre = FACCIONES[clave]["nombre"]
-        color = FACCIONES[clave]["color_torre"]
-        label_seleccion_j1.config(text=f"✔ {nombre}", fg=color)
+        label_seleccion_j1.config(text=f"✔ {nombre}", fg=COLOR_TITULO)
         verificar_selecciones()
 
     for clave, datos in FACCIONES.items():
@@ -404,14 +403,13 @@ def mostrar_seleccion_faccion(root, jugador1, jugador2):
     def elegir_j2(clave):
         faccion_j2["valor"] = clave
         nombre = FACCIONES[clave]["nombre"]
-        color = FACCIONES[clave]["color_torre"]
-        label_seleccion_j2.config(text=f"✔ {nombre}", fg=color)
+        label_seleccion_j2.config(text=f"✔ {nombre}", fg=COLOR_TITULO)
         verificar_selecciones()
 
     for clave, datos in FACCIONES.items():
         def hacer_elegir_j2(c=clave): #asegura que el boton escoja el valor correcto
             elegir_j2(c)
-        tk.Button(frame_j2, text=datos["nombre"], font=FUENTE_NORMAL, bg=datos["color_torre"], fg="white", width=15, command=hacer_elegir_j2).pack(pady=3)
+        tk.Button(frame_j2, text=datos["nombre"], font=FUENTE_NORMAL, bg=datos["color_boton"], fg="white", width=15, command=hacer_elegir_j2).pack(pady=3)
 
     #Funcion que permite iniciar la partida
     def continuar():
@@ -437,7 +435,7 @@ def mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_at
     frame_principal = tk.Frame(root)
     frame_principal.pack(fill="both", expand=True)
 
-    panel_izq = tk.Frame(frame_principal, width=200, bg=COLOR_PANEL)
+    panel_izq = tk.Frame(frame_principal, width=200, bg="#94A4B2")
     panel_izq.pack(side="left", fill="y")
     panel_izq.pack_propagate(False)
 
@@ -445,7 +443,7 @@ def mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_at
     panel_centro.pack(side="left")
 
     #se crea el panel derecho con ancho fijo y color de fondo
-    panel_der = tk.Frame(frame_principal, width=200, bg=COLOR_PANEL)
+    panel_der = tk.Frame(frame_principal, width=200, bg="#94A4B2")
     panel_der.pack(side="left", fill="y")
     panel_der.pack_propagate(False) #evita que el frame se encoja según su contenido
 
@@ -501,35 +499,35 @@ def mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_at
     canvas.bind("<Button-1>", colocar_unidad) #Deteccion del click
     
     #Elementos de interfaz
-    tk.Label(panel_izq, text=jugador2.nombre_usuario, font=("Arial", 11, "bold"), bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(15,0))
-    tk.Label(panel_izq, text="(Atacante)", font=("Arial", 9, "italic"),bg=COLOR_PANEL, fg="gray").pack()
+    tk.Label(panel_izq, text=jugador2.nombre_usuario, font=("Arial", 11, "bold"), bg="#94A4B2", fg=COLOR_TITULO).pack(pady=(15,0))
+    tk.Label(panel_izq, text="(Atacante)", font=("Arial", 9, "italic"),bg="#94A4B2", fg=COLOR_TITULO).pack()
 
-    label_dinero = tk.Label(panel_izq, text=f"💰 ${estado.dinero_atacante}", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO)
+    label_dinero = tk.Label(panel_izq, text=f"💰 ${estado.dinero_atacante}", font=FUENTE_BOTON, bg="#94A4B2", fg=COLOR_TITULO)
     label_dinero.pack(pady=10)
 
-    tk.Label(panel_izq, text="Ronda", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(5,2))
-    tk.Label(panel_izq, text=f"{estado.ronda_actual}", font=("Arial", 14, "bold"), bg=COLOR_PANEL, fg=COLOR_TITULO).pack()
+    tk.Label(panel_izq, text="Ronda", font=FUENTE_BOTON, bg="#94A4B2", fg=COLOR_TITULO).pack(pady=(5,2))
+    tk.Label(panel_izq, text=f"{estado.ronda_actual}", font=("Arial", 14, "bold"), bg="#94A4B2", fg=COLOR_TITULO).pack()
 
-    tk.Label(panel_izq, text="Unidades", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(10,2))
+    tk.Label(panel_izq, text="Unidades", font=FUENTE_BOTON, bg="#94A4B2", fg=COLOR_TITULO).pack(pady=(10,2))
 
 
 
     #titulo del panel
-    tk.Label(panel_der, text="Estado de batalla", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(15,5))
+    tk.Label(panel_der, text="Estado de batalla", font=FUENTE_BOTON, bg="#94A4B2", fg=COLOR_TITULO).pack(pady=(15,5))
 
     #seccion de la base
-    tk.Label(panel_der, text="🏰 Base", font=FUENTE_BOTON,bg=COLOR_PANEL, fg=COLOR_TITULO).pack(anchor="w", padx=10)
-    label_base = tk.Label(panel_der, text=f"Vida: {estado.base.vida}", font=FUENTE_NORMAL, bg=COLOR_PANEL)
+    tk.Label(panel_der, text="🏰 Base", font=FUENTE_BOTON,bg="#94A4B2", fg=COLOR_TITULO).pack(anchor="w", padx=10)
+    label_base = tk.Label(panel_der, text=f"Vida: {estado.base.vida}", font=FUENTE_NORMAL, bg="#94A4B2")
     label_base.pack(anchor="w", padx=20) #se muestra la vida inicial de la base
 
     #seccion de torres — el frame_torres se limpia y redibuja en cada turno
-    tk.Label(panel_der, text="🗼 Torres", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO).pack(anchor="w", padx=10, pady=(10,0))
-    frame_torres = tk.Frame(panel_der, bg=COLOR_PANEL)
+    tk.Label(panel_der, text="🗼 Torres", font=FUENTE_BOTON, bg="#94A4B2", fg=COLOR_TITULO).pack(anchor="w", padx=10, pady=(10,0))
+    frame_torres = tk.Frame(panel_der, bg="#94A4B2")
     frame_torres.pack(fill="x") #contenedor donde se van a poner los labels de cada torre
 
     #seccion de unidades — igual que torres, se limpia y redibuja en cada turno
     tk.Label(panel_der, text="⚔ Unidades", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO).pack(anchor="w", padx=10, pady=(10,0))
-    frame_unidades = tk.Frame(panel_der, bg=COLOR_PANEL)
+    frame_unidades = tk.Frame(panel_der, bg="#94A4B2")
     frame_unidades.pack(fill="x") #contenedor donde se van a poner los labels de cada unidad    
 
     #Inicia el combate (animación)
@@ -620,7 +618,7 @@ def mostrar_resultado_ronda(root, jugador1, jugador2, faccion_defensor, faccion_
 
     #Caso 3: Ninguno ha ganado
     else:
-        tk.Label(root, text=f"Próxima: Ronda {estado.ronda_actual + 1}", font=("Arial", 10, "italic"), bg=COLOR_FONDO, fg="gray").pack(pady=5)
+        tk.Label(root, text=f"Próxima: Ronda {estado.ronda_actual + 1}", font=("Arial", 10, "italic"), bg=COLOR_FONDO, fg="#0C253A").pack(pady=5)
 
         def siguiente_ronda(): #Se prepara la nueva ronda y se vuelve a mostrar la pantalla del defensor
             preparar_nueva_ronda(estado)
@@ -694,7 +692,7 @@ def mostrar_top_jugadores(root):
     #se recolectan los defensores
     top_defensores = gestor.obtener_top_defensores()
     if not top_defensores: #Si no hay jugadores
-        tk.Label(frame_def, text="Sin jugadores registrados", font=FUENTE_NORMAL, bg=COLOR_PANEL, fg="gray").pack()
+        tk.Label(frame_def, text="Sin jugadores registrados", font=FUENTE_NORMAL, bg=COLOR_PANEL, fg=COLOR_TITULO).pack()
     
     else:
         for i, jugador in enumerate(top_defensores, start=1):
@@ -709,7 +707,7 @@ def mostrar_top_jugadores(root):
 
     top_atacantes = gestor.obtener_top_atacantes()
     if not top_atacantes: #Si no hay atacantes
-        tk.Label(frame_atk, text="Sin jugadores registrados",font=FUENTE_NORMAL, bg=COLOR_PANEL, fg="gray").pack()
+        tk.Label(frame_atk, text="Sin jugadores registrados",font=FUENTE_NORMAL, bg=COLOR_PANEL, fg=COLOR_TITULO).pack()
     
     else:
         for i, jugador in enumerate(top_atacantes, start=1):

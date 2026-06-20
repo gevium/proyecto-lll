@@ -21,9 +21,9 @@ UNIDADES = {
 #FACCIONES
 #Se pueden remplazar con imagenes. Version preliminar: colores
 FACCIONES = {
-    "medieval": {"color_boton": "#986846"},
-    "futurista": {"color_boton": "#4F8D94"},
-    "naturaleza": {"color_boton": "#7EB758"}
+    "medieval": {"nombre": "Medieval", "color_boton": "#986846"},
+    "futurista": {"nombre": "Futurista", "color_boton": "#4F8D94"},
+    "naturaleza": {"nombre": "Naturaleza", "color_boton": "#7EB758"}
 }
  
 #Valores iniciales

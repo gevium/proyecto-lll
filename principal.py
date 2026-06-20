@@ -10,6 +10,7 @@ def iniciar_programa():
     principal.title("Defensa y Asalto de Base")
     principal.geometry("1100x700")
     principal.resizable(False, False)
+    principal.configure(background="#94A4B2")
 
     import ventanas #Se cargaj todas las imagenes
     ventanas.cargar_todas_las_imagenes()
