@@ -58,5 +58,11 @@
         "contraseña": "1234",
         "victorias_defensor": 0,
         "victorias_atacante": 0
+    },
+    "Paco": {
+        "nombre_usuario": "Paco",
+        "contraseña": "1212",
+        "victorias_defensor": 0,
+        "victorias_atacante": 0
     }
 }

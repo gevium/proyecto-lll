@@ -21,16 +21,15 @@ UNIDADES = {
 #FACCIONES
 #Se pueden remplazar con imagenes. Version preliminar: colores
 FACCIONES = {
-    "medieval": {"nombre": "Medieval", "color_torre": "#8B4513", "color_muro": "#A9A9A9", "color_unidad": "#556B2F", "color_base": "#FFD700"},
-    "futurista": {"nombre": "Futurista","color_torre": "#00CED1","color_muro": "#4682B4","color_unidad": "#FF4500","color_base": "#9400D3"},
-    "naturaleza": {"nombre": "Naturaleza","color_torre": "#228B22","color_muro": "#8B5A2B","color_unidad": "#6B8E23","color_base": "#32CD32"}
+    "medieval": {"color_boton": "#986846"},
+    "futurista": {"color_boton": "#4F8D94"},
+    "naturaleza": {"color_boton": "#7EB758"}
 }
  
 #Valores iniciales
 DINERO_INICIAL_DEFENSOR = 200
 DINERO_INICIAL_ATACANTE = 200
 DINERO_POR_RONDA = 50
-TAMANO_MAPA = 10  #cuadricula 10x10
 VIDA_BASE_CENTRAL = 200
 RONDAS_PARA_GANAR = 3
 

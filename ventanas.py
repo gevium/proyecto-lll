@@ -3,21 +3,61 @@ from tkinter import messagebox
 from clases import Jugadores_Json, Torre, Muro, Unidad, TORRES, UNIDADES, FACCIONES
 from combate import EstadoJuego, ejecutar_combate, preparar_nueva_ronda
 
+def cargar_imagen(ruta):
+    img = tk.PhotoImage(file=ruta)
+    return img.subsample(16, 16)  # 1024/16 = 64px exacto
+
+
+IMAGENES = {}  # diccionario vacio al inicio
+
+def cargar_todas_las_imagenes():
+    global IMAGENES
+    IMAGENES = {
+        "soldado_medieval": cargar_imagen("imagenes/soldado_medieval.png"),
+        "soldado_futurista": cargar_imagen("imagenes/soldado_tecno.png"),
+        "soldado_naturaleza": cargar_imagen("imagenes/soldado_natural.png"),
+        "tanque_medieval": cargar_imagen("imagenes/tanque_medieval.png"),
+        "tanque_futurista": cargar_imagen("imagenes/tanque_tecno.png"),
+        "tanque_naturaleza": cargar_imagen("imagenes/tanque_natural.png"),
+        "rapida_medieval": cargar_imagen("imagenes/u_rapida_medieval.png"),
+        "rapida_futurista": cargar_imagen("imagenes/u_rapida_tecno.png"),
+        "rapida_naturaleza": cargar_imagen("imagenes/u_rapida_natural.png"),
+        "basica_medieval": cargar_imagen("imagenes/torre_N1_medieval.png"),
+        "pesada_medieval": cargar_imagen("imagenes/torre_N2_medieval.png"),
+        "magica_medieval": cargar_imagen("imagenes/torre_N3_medieval.png"),
+        "basica_futurista": cargar_imagen("imagenes/torre_N1_tecno.png"),
+        "pesada_futurista": cargar_imagen("imagenes/torre_N2_tecno.png"),
+        "magica_futurista": cargar_imagen("imagenes/torre_N3_tecno.png"),
+        "basica_naturaleza": cargar_imagen("imagenes/torre_N1_natural.png"),
+        "pesada_naturaleza": cargar_imagen("imagenes/torre_N2_natural.png"),
+        "magica_naturaleza": cargar_imagen("imagenes/torre_N3_natural.png"),
+        "muro_medieval": cargar_imagen("imagenes/muro_medieval.png"),
+        "muro_futurista": cargar_imagen("imagenes/muro_tecno.png"),
+        "muro_naturaleza": cargar_imagen("imagenes/muro_natural.png"),
+        "base": cargar_imagen("imagenes/base.png"),
+        "cesped": cargar_imagen("imagenes/cesped.png"),
+        "fondo": tk.PhotoImage(file="imagenes/fondo.png")
+    }
 
 '''
 ##############################################################################
 VARIABLES/CONSTANTES GLOBALES
 ##############################################################################
 '''
+
+TAMANO_CASILLA = 64  
+FILAS = 11
+COLUMNAS = 11
+
 gestor = Jugadores_Json() #Instancia que permite leer y escribir las cuentas de usuario en JSON
 sesion_actual = {"jugador1": None, "jugador2": None} #Dicccionario para ubicar las instancias (elementos) de los jugadores actuales
 
 #Paleta de colores y fuentes para ventanas generales
-COLOR_FONDO = "#F0F4F8"
-COLOR_PANEL = "#D9E2EC"
-COLOR_BOTON = "#4A90D9"
-COLOR_BOTON_TEXTO = "white"
-COLOR_TITULO = "#1A2E4A"
+COLOR_FONDO = "#7f9db6"       # azul oscuro que combina con el fondo
+COLOR_PANEL = "#7f9db6"       # panel más oscuro semiopaco
+COLOR_BOTON = "#94A4B2"       # dorado oscuro medieval
+COLOR_BOTON_TEXTO = "#354256" # texto crema
+COLOR_TITULO = "#202636"      # títulos crema
 FUENTE_TITULO = ("Georgia", 16, "bold")
 FUENTE_NORMAL = ("Arial", 10)
 FUENTE_BOTON = ("Arial", 10, "bold")
@@ -32,6 +72,9 @@ FUNCIONES PARA EL INICIO-REGISTRO DE SESION
 def limpiar_pantalla(root):
     for widget in root.winfo_children():
         widget.destroy()
+    label_fondo = tk.Label(root, image=IMAGENES["fondo"])
+    label_fondo.place(x=0, y=0, relwidth=1, relheight=1)
+    label_fondo.lower()
 
 #Funcion que permite gestionar la informacion brindada para el registro de un usuario
 def registrar(entry_user, entry_contra):
@@ -74,7 +117,7 @@ def iniciar_sesion(root, entry_user, entry_contra, label_estado, btn_comenzar):
     #Se asigna el jugador 1
     if sesion_actual["jugador1"] is None: #El campo inicia vacío
         sesion_actual["jugador1"] = jugador 
-        label_estado.config(text=f"✔ {jugador.nombre_usuario} ha sido seleccionado. Esperando jugador 2...", fg="green")
+        label_estado.config(text=f"✔ {jugador.nombre_usuario} ha sido seleccionado. Esperando jugador 2...", fg=COLOR_TITULO)
         entry_user.delete(0, tk.END) #Se limpian los campos
         entry_contra.delete(0, tk.END)
 
@@ -86,7 +129,7 @@ def iniciar_sesion(root, entry_user, entry_contra, label_estado, btn_comenzar):
             messagebox.showwarning("Aviso", "El jugador 2 debe ser una cuenta diferente.")
             return
         sesion_actual["jugador2"] = jugador
-        label_estado.config(text=f"✔ {jugador.nombre_usuario} ha sido seleccionado. ¡Es hora de para comenzar!", fg="blue")
+        label_estado.config(text=f"✔ {jugador.nombre_usuario} ha sido seleccionado. ¡Es hora de para comenzar!", fg=COLOR_TITULO)
         btn_comenzar.config(state="normal") #Se activa el boton para comenzar partida
         entry_user.delete(0, tk.END)
         entry_contra.delete(0, tk.END)
@@ -108,26 +151,26 @@ def mostrar_login(root):
     #Elementos de interfaz (LABELS Y BOTONES):
     root.configure(bg=COLOR_FONDO)
 
-    tk.Label(root, text="Defensa y Asalto de Base", font=FUENTE_TITULO, bg=COLOR_FONDO, fg=COLOR_TITULO).pack(pady=30)
+    tk.Label(root, text="Defensa y Asalto de Base", font=("Georgia", 28, "bold"), bg=COLOR_FONDO, fg=COLOR_TITULO).pack(pady=(70, 0))
 
     frame = tk.Frame(root, bg=COLOR_PANEL, padx=30, pady=30)
     frame.pack(pady=10)
 
-    tk.Label(frame, text="Usuario:", font=FUENTE_NORMAL, bg=COLOR_PANEL).pack(anchor="w")
+    tk.Label(frame, text="USUARIO:", font=FUENTE_NORMAL, bg=COLOR_PANEL).pack(pady=(10,0))
     entry_user = tk.Entry(frame, font=FUENTE_NORMAL, width=25)
     entry_user.pack(pady=5)
 
-    tk.Label(frame, text="Contraseña:", font=FUENTE_NORMAL, bg=COLOR_PANEL).pack(anchor="w", pady=(10,0))
+    tk.Label(frame, text="CONTRASEÑA:", font=FUENTE_NORMAL, bg=COLOR_PANEL).pack(pady=(10,0))
     entry_contra = tk.Entry(frame, font=FUENTE_NORMAL, width=25, show="*")
     entry_contra.pack(pady=5)
 
     tk.Button(frame, text="Iniciar sesión", font=FUENTE_BOTON, bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, width=20,  command=lambda: iniciar_sesion(root, entry_user, entry_contra, label_estado, btn_comenzar)).pack(pady=(15,5))
-    tk.Button(frame, text="Registrarse", font=FUENTE_BOTON, bg=COLOR_PANEL, width=20, command=lambda: registrar(entry_user, entry_contra)).pack(pady=5)
+    tk.Button(frame, text="Registrarse", font=FUENTE_BOTON, bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, width=20, command=lambda: registrar(entry_user, entry_contra)).pack(pady=5)
     
-    label_estado = tk.Label(frame, text="Esperando jugador 1...", font=FUENTE_NORMAL, bg=COLOR_PANEL, fg="gray")
+    label_estado = tk.Label(frame, text="Esperando jugador 1...", font=FUENTE_NORMAL, bg=COLOR_PANEL, fg=COLOR_BOTON_TEXTO)
     label_estado.pack(pady=5)
 
-    btn_comenzar = tk.Button(frame, text="⚔ Comenzar partida", font=FUENTE_BOTON, bg="green", fg="white", width=20, state="disabled", command=lambda: mostrar_seleccion_faccion(root, sesion_actual["jugador1"], sesion_actual["jugador2"]))
+    btn_comenzar = tk.Button(frame, text="⚔ Comenzar partida", font=FUENTE_BOTON, bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, width=20, state="disabled", command=lambda: mostrar_seleccion_faccion(root, sesion_actual["jugador1"], sesion_actual["jugador2"]))
     btn_comenzar.pack(pady=5)
 
     tk.Button(frame, text="Top Jugadores", font=FUENTE_BOTON, bg=COLOR_PANEL, width=20, command=lambda: mostrar_top_jugadores(root)).pack(pady=5)
@@ -155,16 +198,27 @@ def redibujar_mapa(canvas, FILAS, COLUMNAS, TAMANO_CASILLA,estado,faccion_defens
             #En base a su tipo (o si está vacía, se le asiga un color)
             #Se usan las contanstes con las facciones anteriormente seleccionadas
             if entidad is None:
-                canvas.create_rectangle(x1, y1, x2, y2, fill="green", outline="black")
+                canvas.create_image(x1 + 25, y1 + 25, image=IMAGENES["cesped"])
             elif entidad.tipo == "base":
-                canvas.create_rectangle(x1, y1, x2, y2, fill="gold", outline="black")
-                canvas.create_text(x1 + 25, y1 + 25, text="BASE", font=("Arial", 7, "bold"))
+                canvas.create_image(x1 + 25, y1 + 25, image=IMAGENES["cesped"])
+                canvas.create_image(x1 + 25, y1 + 25, image=IMAGENES["base"])
             elif entidad.tipo == "torre":
-                canvas.create_rectangle(x1, y1, x2, y2, fill=FACCIONES[faccion_defensor]["color_torre"], outline="black")
+                canvas.create_image(x1 + 25, y1 + 25, image=IMAGENES["cesped"])
+                clave = f"{entidad.habilidad.split('_')[0]}_{faccion_defensor}"
+                # mapear habilidad a tipo de torre
+                tipo_torre = {"disparo": "basica", "daño": "pesada", "congelar": "magica"}.get(entidad.habilidad.split("_")[0], "basica")
+                clave = f"{tipo_torre}_{faccion_defensor}"
+                canvas.create_image(x1 + 25, y1 + 25, image=IMAGENES.get(clave, IMAGENES["base"]))
             elif entidad.tipo == "muro":
-                canvas.create_rectangle(x1, y1, x2, y2, fill=FACCIONES[faccion_defensor]["color_muro"], outline="black")
-            elif entidad.tipo == "unidad":  # ← agregar esto
-                canvas.create_rectangle(x1, y1, x2, y2, fill=FACCIONES[faccion_atacante]["color_unidad"], outline="black")
+                canvas.create_image(x1 + 25, y1 + 25, image=IMAGENES["cesped"])
+                canvas.create_image(x1 + 25, y1 + 25, image=IMAGENES[f"muro_{faccion_defensor}"])
+            elif entidad.tipo == "unidad":
+                canvas.create_image(x1 + 25, y1 + 25, image=IMAGENES["cesped"])
+                # mapear nombre a clave
+                tipo_unidad = {"Soldado": "soldado", "Tanque": "tanque", "Unidad Rapida": "rapida"}.get(entidad.nombre, "soldado")
+                clave = f"{tipo_unidad}_{faccion_atacante}"
+                if faccion_atacante:
+                    canvas.create_image(x1 + 32, y1 + 32, image=IMAGENES.get(clave, IMAGENES["base"]))
 
 '''
 ##############################################################################
@@ -176,10 +230,6 @@ FIG
 #Funcion que permite inicializar el mapa, y muestra el panel del turno del defensor
 def mostrar_mapa_y_defensor(root, jugador1, jugador2, faccion_defensor, faccion_atacante, estado=None):
     limpiar_pantalla(root)
-    
-    TAMANO_CASILLA = 50  
-    FILAS = 11
-    COLUMNAS = 11
 
     if estado is None: #si es la primera ronda crea el estado, si no, reutiliza el existente
         estado = EstadoJuego(jugador1, jugador2)
@@ -205,7 +255,7 @@ def mostrar_mapa_y_defensor(root, jugador1, jugador2, faccion_defensor, faccion_
     tk.Label(panel_izq, text=jugador1.nombre_usuario, font=("Arial", 11, "bold"), bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(15,0))
     tk.Label(panel_izq, text="(Defensor)", font=("Arial", 9, "italic"), bg=COLOR_PANEL, fg="gray").pack()
 
-    label_dinero = tk.Label(panel_izq, text=f"💰 ${estado.dinero_defensor}", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO)
+    label_dinero = tk.Label(panel_izq, text=f"${estado.dinero_defensor}", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO)
     label_dinero.pack(pady=10)
 
     tk.Label(panel_izq, text="Ronda", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(15,2))
@@ -221,7 +271,7 @@ def mostrar_mapa_y_defensor(root, jugador1, jugador2, faccion_defensor, faccion_
     tk.Label(panel_izq, text="Muros", font=FUENTE_BOTON, bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=(10,2))
     tk.Button(panel_izq, text="Muro - $20", font=FUENTE_NORMAL, bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, width=15, command=lambda: cambiar_seleccion("muro")).pack(pady=3)
 
-    tk.Button(panel_izq, text="✔ Listo", font=FUENTE_BOTON, bg="green", fg="white", width=15, command=ir_a_fase_atacante).pack(pady=20)
+    tk.Button(panel_izq, text="✔ Listo", font=FUENTE_BOTON, bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, width=15, command=ir_a_fase_atacante).pack(pady=20)
     
     #Se cra el canvas con la matriz
     canvas = tk.Canvas(panel_centro, width=COLUMNAS * TAMANO_CASILLA, height=FILAS * TAMANO_CASILLA)
@@ -306,7 +356,7 @@ def mostrar_seleccion_faccion(root, jugador1, jugador2):
     frame_j1.grid(row=0, column=0, padx=20)
 
     tk.Label(frame_j1, text=jugador1.nombre_usuario, font=("Arial", 11, "bold"), bg=COLOR_PANEL, fg=COLOR_TITULO).pack()
-    tk.Label(frame_j1, text="(Defensor)", font=("Arial", 9, "italic"),bg=COLOR_PANEL, fg="gray").pack(pady=2)
+    tk.Label(frame_j1, text="(Defensor)", font=("Arial", 9, "italic"),bg=COLOR_PANEL, fg=COLOR_TITULO).pack(pady=2)
     label_seleccion_j1 = tk.Label(frame_j1, text="Sin selección",font=FUENTE_NORMAL, bg=COLOR_PANEL, fg="gray")
     label_seleccion_j1.pack(pady=5)
 
@@ -315,14 +365,14 @@ def mostrar_seleccion_faccion(root, jugador1, jugador2):
     frame_j2.grid(row=0, column=1, padx=20)
 
     tk.Label(frame_j2, text=jugador2.nombre_usuario, font=("Arial", 11, "bold"), bg=COLOR_PANEL, fg=COLOR_TITULO).pack()
-    tk.Label(frame_j2, text="(Atacante)", font=("Arial", 9, "italic"), bg=COLOR_PANEL, fg="gray").pack(pady=2)
-    label_seleccion_j2 = tk.Label(frame_j2, text="Sin selección", font=FUENTE_NORMAL, bg=COLOR_PANEL, fg="gray")
+    tk.Label(frame_j2, text="(Atacante)", font=("Arial", 9, "italic"), bg=COLOR_PANEL, ffg=COLOR_TITULO).pack(pady=2)
+    label_seleccion_j2 = tk.Label(frame_j2, text="Sin selección", font=FUENTE_NORMAL, bg=COLOR_PANEL, fg=COLOR_BOTON_TEXTO)
     label_seleccion_j2.pack(pady=5)
 
-    label_aviso = tk.Label(root, text="", fg="#D03221", bg=COLOR_FONDO, font=FUENTE_NORMAL)
+    label_aviso = tk.Label(root, text="", fg="#1A173A", bg=COLOR_FONDO, font=FUENTE_NORMAL)
     label_aviso.pack(pady=5)
 
-    btn_continuar = tk.Button(root, text="⚔ Comenzar partida", font=FUENTE_BOTON,bg="green", fg="white", width=20, state="disabled")
+    btn_continuar = tk.Button(root, text="⚔ Comenzar partida", font=FUENTE_BOTON,bg=COLOR_BOTON_TEXTO, fg="white", width=20, state="disabled")
     btn_continuar.pack(pady=10)
 
     #Funcion que verifica que ambos jugadores hayan escogido facciones
@@ -348,7 +398,7 @@ def mostrar_seleccion_faccion(root, jugador1, jugador2):
     for clave, datos in FACCIONES.items():
         def hacer_elegir_j1(c=clave): #asegura que el boton escoja el valor correcto
             elegir_j1(c)
-        tk.Button(frame_j1, text=datos["nombre"], font=FUENTE_NORMAL, bg=datos["color_torre"], fg="white", width=15, command=hacer_elegir_j1).pack(pady=3)
+        tk.Button(frame_j1, text=datos["nombre"], font=FUENTE_NORMAL, bg=datos["color_boton"], fg="white", width=15, command=hacer_elegir_j1).pack(pady=3)
 
     #Se actualiza la interfaz que se utilizará para el jugador 2
     def elegir_j2(clave):
@@ -380,10 +430,6 @@ FIG
 #Despliega la interfaz del atacante
 def mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_atacante, estado):
     limpiar_pantalla(root) 
-
-    TAMANO_CASILLA = 50
-    FILAS = 11
-    COLUMNAS = 11
 
     seleccion_actual = [None]
 
@@ -580,9 +626,7 @@ def mostrar_resultado_ronda(root, jugador1, jugador2, faccion_defensor, faccion_
             preparar_nueva_ronda(estado)
             mostrar_mapa_y_defensor(root, jugador1, jugador2, faccion_defensor, faccion_atacante, estado)
 
-        tk.Button(root, text="Siguiente ronda", font=FUENTE_BOTON,
-                  bg="green", fg="white", width=20,
-                  command=siguiente_ronda).pack(pady=10)
+        tk.Button(root, text="Siguiente ronda", font=FUENTE_BOTON, bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, width=20, command=siguiente_ronda).pack(pady=10)
 
 '''
 ##############################################################################
@@ -603,7 +647,7 @@ def mostrar_ganador_partida(root, jugador1, jugador2, ganador):
     else:
         jugador_ganador = jugador2
         rol_ganador = "atacante"
-        color = "#D03221"
+        color =COLOR_BOTON
 
     #Se realiza la sumatoria (para ambos jugadores)
     jugador_ganador.sumar_victoria("defensor")
