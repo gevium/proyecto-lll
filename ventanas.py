@@ -319,7 +319,7 @@ def mostrar_seleccion_faccion(root, jugador1, jugador2):
     label_seleccion_j2 = tk.Label(frame_j2, text="Sin selección", font=FUENTE_NORMAL, bg=COLOR_PANEL, fg="gray")
     label_seleccion_j2.pack(pady=5)
 
-    label_aviso = tk.Label(root, text="", fg="red", bg=COLOR_FONDO, font=FUENTE_NORMAL)
+    label_aviso = tk.Label(root, text="", fg="#D03221", bg=COLOR_FONDO, font=FUENTE_NORMAL)
     label_aviso.pack(pady=5)
 
     btn_continuar = tk.Button(root, text="⚔ Comenzar partida", font=FUENTE_BOTON,bg="green", fg="white", width=20, state="disabled")
@@ -531,7 +531,7 @@ def mostrar_fase_atacante(root, jugador1, jugador2, faccion_defensor, faccion_at
             cambiar_seleccion(c)
         tk.Button(panel_izq, text=f"{datos['nombre']} - ${datos['costo']}", font=FUENTE_NORMAL, bg=COLOR_BOTON, fg=COLOR_BOTON_TEXTO, command=hacer_seleccion, width=15).pack(pady=3)
 
-    tk.Button(panel_izq, text="Iniciar combate", font=FUENTE_BOTON, bg="red", fg="white", command=iniciar_combate, width=15).pack(pady=20)
+    tk.Button(panel_izq, text="Iniciar combate", font=FUENTE_BOTON, bg="#D03221", fg="white", command=iniciar_combate, width=15).pack(pady=20)
     redibujar_mapa(canvas, FILAS, COLUMNAS, TAMANO_CASILLA, estado, faccion_defensor, faccion_atacante) 
 
 '''
@@ -551,7 +551,7 @@ def mostrar_resultado_ronda(root, jugador1, jugador2, faccion_defensor, faccion_
     else:
         nombre_ganador = jugador2.nombre_usuario
 
-    color_ganador = COLOR_BOTON
+    color_ganador = COLOR_BOTON if ganador == "defensor" else "#D03221"
 
     #Elementos de interfaz
     tk.Label(root, text="Fin de Ronda", font=FUENTE_TITULO, bg=COLOR_FONDO, fg=COLOR_TITULO).pack(pady=20)
@@ -570,7 +570,7 @@ def mostrar_resultado_ronda(root, jugador1, jugador2, faccion_defensor, faccion_
 
     #Caso 2. Ganó atacante
     elif estado.rondas_atacante >= 3:
-        tk.Button(root, text="Ver ganador", font=FUENTE_BOTON, bg="red", fg="white", width=20, command=lambda: mostrar_ganador_partida(root, jugador1, jugador2, "atacante")).pack(pady=20)
+        tk.Button(root, text="Ver ganador", font=FUENTE_BOTON, bg="#D03221", fg="white", width=20, command=lambda: mostrar_ganador_partida(root, jugador1, jugador2, "atacante")).pack(pady=20)
 
     #Caso 3: Ninguno ha ganado
     else:
@@ -603,7 +603,7 @@ def mostrar_ganador_partida(root, jugador1, jugador2, ganador):
     else:
         jugador_ganador = jugador2
         rol_ganador = "atacante"
-        color = COLOR_BOTON
+        color = "#D03221"
 
     #Se realiza la sumatoria (para ambos jugadores)
     jugador_ganador.sumar_victoria("defensor")

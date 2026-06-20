@@ -50,16 +50,11 @@ def calcular_movimiento(unidad, mapa):
         nueva_fila = fila + 1 if fila < fila_base else fila - 1
 
     contenido_celda = mapa[nueva_fila][nueva_col]
-    if contenido_celda is not None and contenido_celda.tipo == "muro":
-        return None
-    return (nueva_fila, nueva_col)
-        
-    contenido_celda = mapa[nueva_fila][nueva_col] #se determina que contenido (elemento) hay en la celda
+
+    if contenido_celda is not None and contenido_celda.tipo in ("muro", "torre"):
+        return None #se "bloquea", no puede avanzar
     
-    #Si no está vacío o hay un muro
-    if contenido_celda is not None and contenido_celda.tipo == "muro":
-        return None  #se queda bloqueada, no puede moverse
-    return (nueva_fila, nueva_col) #retorna la nueva/proxima posicion
+    return (nueva_fila, nueva_col)
 
 #funcion que permite ejecutar las habilidades de las entidades
 def ejecutar_turno(estado):
@@ -69,22 +64,29 @@ def ejecutar_turno(estado):
             continue  #si ya fue destruida solo se ignora, la limpieza se hace en las torres
         
         for _ in range(unidad.velocidad): #el for se repite n cantidad de veces (n = velocidad)
+            #la velocidad representa la cantidad de bloques que se mueve
+
             nueva_pos = calcular_movimiento(unidad, estado.mapa)
-            if nueva_pos is None:
+
+            if nueva_pos is None: #Si es None, significa que encontró un muro 
                 fila, columna = unidad.posicion
-                #calcula la direccion del obstaculo igual que calcular_movimiento
-                if columna != 5:
+
+                #Se define
+                if columna != 5: #Si la unidad no está alineada en columna con la base, el obstáculo está en la misma fila pero una columna adelante
                     fila_frente = fila
                     col_frente = columna + 1 if columna < 5 else columna - 1
                 else:
-                    col_frente = columna
+                    col_frente = columna #Si ya está alineada en columna (columna == 5), el obstáculo está en la misma columna pero una fila adelant
                     fila_frente = fila + 1 if fila < 5 else fila - 1
 
-                if 0 <= col_frente <= 10 and 0 <= fila_frente <= 10:
-                    objetivo = estado.mapa[fila_frente][col_frente]
-                    if objetivo is not None and objetivo.tipo in ("muro", "torre"):
+                if 0 <= col_frente <= 10 and 0 <= fila_frente <= 10: #Verifica que la posición calculada no salga del mapa.
+
+                    objetivo = estado.mapa[fila_frente][col_frente] 
+
+                    if objetivo is not None and objetivo.tipo in ("muro", "torre"): #Si es una torre o muro, la daña
                         objetivo.recibir_daño(unidad.daño)
-                        if objetivo.esta_destruido():
+
+                        if objetivo.esta_destruido(): #Si el impacto la daña, la borra de la matriz
                             estado.mapa[fila_frente][col_frente] = None
                             if objetivo.tipo == "muro" and objetivo in estado.muros:
                                 estado.muros.remove(objetivo)
@@ -92,103 +94,109 @@ def ejecutar_turno(estado):
                                 estado.torres.remove(objetivo)
                 break
             
-            celda_destino = estado.mapa[nueva_pos[0]][nueva_pos[1]]
-
             if nueva_pos == (5, 5):
-                # llegó a la base, la ataca sin pisarla
+                #llegó a la base, la ataca sin pisarla
                 estado.base.recibir_daño(unidad.daño)
                 estado.dinero_atacante += 5
                 break
 
-            # si la celda tiene algo que no es la base ni está vacía, detenerse
-            if celda_destino is not None:
-                if celda_destino.tipo in ("muro", "torre"):
-                    celda_destino.recibir_daño(unidad.daño)
-                    if celda_destino.esta_destruido():
-                        estado.mapa[nueva_pos[0]][nueva_pos[1]] = None
-                        if celda_destino.tipo == "muro" and celda_destino in estado.muros:
-                            estado.muros.remove(celda_destino)
-                        elif celda_destino.tipo == "torre" and celda_destino in estado.torres:
-                            estado.torres.remove(celda_destino)
-                break
-
-
-            # moverse normalmente
+            #moverse normalmente
             estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None
             unidad.posicion = nueva_pos
             estado.mapa[nueva_pos[0]][nueva_pos[1]] = unidad
 
-    # torres disparan
+    #Disparo de las torres
+
+    unidades_a_eliminar = [] #Almacenamiento temporal para evitar errores de mutación de listas
+
     for torre in estado.torres:
-        if torre.esta_destruido():
+        if torre.esta_destruido(): #Si está destruida, se ignora
             continue
 
         objetivo = None
+        #Busca el primer objetivo valido
         for unidad in estado.unidades:
+
+            #Si la unidad aun existe (...) y está dentro del rango
             if not unidad.esta_destruido() and unidad.posicion is not None and torre.en_rango(unidad.posicion[0], unidad.posicion[1]):
                 objetivo = unidad
                 break
-
-        if objetivo is not None:
+        
+        #Si encuentra uno:
+        if objetivo is not None: #Si si hay objetivo
             objetivo.recibir_daño(torre.daño)
             estado.dinero_defensor += 3
 
+            #Si el disparó destruyó el objetivo
             if objetivo.esta_destruido():
                 estado.mapa[objetivo.posicion[0]][objetivo.posicion[1]] = None
-                objetivo.posicion = None  # <- aqui va esto
-                estado.unidades.remove(objetivo)
-                estado.dinero_defensor += 10
+                objetivo.posicion = None
+                if objetivo not in unidades_a_eliminar:
+                    unidades_a_eliminar.append(objetivo)
+                estado.dinero_defensor += 10 # Bonificación por eliminación completa
 
+            #Actualización del estado de turno de la torre
             torre.turnos_restantes -= 1
             if torre.turnos_restantes <= 0:
                 torre.activar_habilidad(estado, objetivo)
+
+    #Limpieza de las unidades muertas de la lista principal
+    for unidad_muerta in unidades_a_eliminar:
+        if unidad_muerta in estado.unidades:
+            estado.unidades.remove(unidad_muerta)
     
+
+#Analiza si se cumplen las condiciones de victoria o derrota
 def verificar_fin_ronda(estado):
-    # el atacante gana si la base llego a 0
+
+    #el atacante gana si la base llego a 0
     if estado.base.esta_destruido():
         return "atacante"
     
-    # el defensor gana si no quedan unidades vivas
+    #el defensor gana si no quedan unidades vivas
     unidades_vivas = [u for u in estado.unidades if not u.esta_destruido()]
     if len(unidades_vivas) == 0:
         return "defensor"
     
+    #El atacante se queda sin dinero ni unidades
     if estado.dinero_atacante <= 0 and len(estado.unidades) == 0:
         return "defensor"
 
-    # la ronda sigue
+    #la ronda sigue
     return None
 
-
+#Se limpia todo el tablero por completo
 def preparar_nueva_ronda(estado):
-    # limpiar unidades
+
+    #se limpian unidades
     for unidad in estado.unidades:
         if unidad.posicion is not None:
             estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None
     estado.unidades = []
 
-    # resetear vida de la base
+    #se resetea vida de la base
     estado.base.vida = estado.base.vida_maxima
 
-    # sumar dinero de ronda a ambos
+    #se suma dinero de ronda a ambos
     estado.dinero_defensor += DINERO_POR_RONDA
     estado.dinero_atacante += DINERO_POR_RONDA
 
-    # avanzar ronda
+    #se avanza un ronda
     estado.ronda_actual += 1
 
-    # limpiar torres
+    #se limpian las torres
     for torre in estado.torres:
         if torre.posicion is not None:
             estado.mapa[torre.posicion[0]][torre.posicion[1]] = None
     estado.torres = []
 
-    # limpiar muros
+    #se limpian los muros
     for muro in estado.muros:
         if muro.posicion is not None:
             estado.mapa[muro.posicion[0]][muro.posicion[1]] = None
     estado.muros = []
 
+#Funcion que controla el bucle de rondas
 def ejecutar_combate(estado, actualizar_ui=None):
     MAX_TURNOS = 100
     turno = 0
@@ -197,13 +205,14 @@ def ejecutar_combate(estado, actualizar_ui=None):
         turno += 1
         ejecutar_turno(estado)
         
-        # actualizar la interfaz si se paso un callback
+        #si se llamó alguna funcion/instruccion, se actualiza el UI
         if actualizar_ui is not None:
             actualizar_ui()
         
-        # verificar si alguien gano la ronda
+        #verifica si alguien gano la ronda
         ganador = verificar_fin_ronda(estado)
-        
+
+        #Si ya hay un ganador de la ronda   
         if ganador is not None:
             if ganador == "defensor":
                 estado.rondas_defensor += 1
@@ -211,7 +220,7 @@ def ejecutar_combate(estado, actualizar_ui=None):
                 estado.rondas_atacante += 1
             return ganador
 
-    # se agotaron los turnos sin ganador, gana el defensor
+    #se agotaron los turnos sin ganador, gana el defensor
     estado.rondas_defensor += 1
     return "defensor"
 
