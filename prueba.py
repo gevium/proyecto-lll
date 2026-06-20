@@ -1,7 +1,7 @@
 from clases import Jugador, TORRES, UNIDADES
 from combate import EstadoJuego, ejecutar_turno, verificar_fin_ronda
 import tkinter as tk
-from ventanas import mostrar_mapa
+from ventanas import mostrar_mapa_y_defensor
 
 # Simular dos jugadores
 j1 = Jugador("defensor", "1234")
@@ -46,5 +46,5 @@ for i in range(5):
 
 root = tk.Tk()
 root.geometry("500x600")
-mostrar_mapa(root, j1, j2, "medieval")
+mostrar_mapa_y_defensor(root, j1, j2, "medieval")
 root.mainloop()
