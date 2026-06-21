@@ -9,7 +9,7 @@ REQUISITOS
 CÓMO EJECUTAR
 * Accediendo desde github:
 1. Clonar el repositorio:
-   git clone https://github.com/usuario/nombre-del-repo.git
+   git clone https://github.com/gevium/proyecto-lll.git
 2. Entrar a la carpeta del proyecto:
    cd nombre-del-repo
 3. Ejecutar el archivo principal:
