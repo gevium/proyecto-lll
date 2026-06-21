@@ -24,7 +24,6 @@ ARCHIVOS PRINCIPALES
 * principal.py  → punto de entrada del programa  
 * ventanas.py → interfaz gráfica (Tkinter)  
 * clases.py → lógica del juego (torres, unidades, jugadores, facciones)  
-* combate.py → motor de combate por rondas/turnos  
-* prueba.py → script de pruebas del flujo de combate  
+* combate.py → motor de combate por rondas/turnos   
 * data/jugadores.json → datos de jugadores registrados (usuario, contraseña, victorias)  
 * imagenes/ → recursos gráficos (torres, unidades, muros, fondos) por facción
