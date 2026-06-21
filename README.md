@@ -7,7 +7,15 @@ REQUISITOS
 * Tkinter (incluido con Python)
 
 CÓMO EJECUTAR
-
+* Accediendo desde github:
+1. Clonar el repositorio:
+   git clone https://github.com/usuario/nombre-del-repo.git
+2. Entrar a la carpeta del proyecto:
+   cd nombre-del-repo
+3. Ejecutar el archivo principal:
+   python principal.py
+>>>**Importante:** el programa debe ejecutarse **desde la carpeta raíz** del proyecto para que las rutas a `imagenes/` y `data/` funcionen correctamente.
+* Accediendo desde el zip con los archivos actualizados del proyecto
 1. Descomprimir el archivo .zip  
 2. Abrir una terminal en la carpeta del proyecto  
 3. Ejecutar: python principal.py
