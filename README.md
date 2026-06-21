@@ -14,7 +14,7 @@ CÓMO EJECUTAR
    cd nombre-del-repo
 3. Ejecutar el archivo principal:
    python principal.py
->**Importante:** el programa debe ejecutarse **desde la carpeta raíz** del proyecto para que las rutas a `imagenes/` y `data/` funcionen correctamente. <
+>**Importante:** el programa debe ejecutarse **desde la carpeta raíz** del proyecto para que las rutas a `imagenes/` y `data/` funcionen correctamente. 
 * Accediendo desde el zip con los archivos actualizados del proyecto
 1. Descomprimir el archivo .zip  
 2. Abrir una terminal en la carpeta del proyecto  
