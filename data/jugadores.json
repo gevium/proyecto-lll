@@ -70,5 +70,23 @@
         "contraseña": "A",
         "victorias_defensor": 0,
         "victorias_atacante": 0
+    },
+    "Maria": {
+        "nombre_usuario": "Maria",
+        "contraseña": "prueba2",
+        "victorias_defensor": 0,
+        "victorias_atacante": 0
+    },
+    "A": {
+        "nombre_usuario": "A",
+        "contraseña": "A",
+        "victorias_defensor": 2,
+        "victorias_atacante": 0
+    },
+    "B": {
+        "nombre_usuario": "B",
+        "contraseña": "B",
+        "victorias_defensor": 0,
+        "victorias_atacante": 3
     }
 }

@@ -1,4 +1,4 @@
-from clases import Torre, Unidad, Muro, BaseCentral, DINERO_INICIAL_DEFENSOR, DINERO_INICIAL_ATACANTE, DINERO_POR_RONDA, RONDAS_PARA_GANAR
+from clases import Torre, Unidad, Muro, BaseCentral, DINERO_INICIAL_DEFENSOR, DINERO_INICIAL_ATACANTE, RONDAS_PARA_GANAR
 
 '''
 ########################################################################
@@ -54,6 +54,10 @@ def calcular_movimiento(unidad, mapa):
     if contenido_celda is not None and contenido_celda.tipo in ("muro", "torre"):
         return None #se "bloquea", no puede avanzar
     
+     #no puede moverse a una casilla ocupada por otra unidad
+    if contenido_celda is not None and contenido_celda.tipo == "unidad":
+        return None 
+    
     return (nueva_fila, nueva_col)
 
 #funcion que permite ejecutar las habilidades de las entidades
@@ -66,6 +70,9 @@ def ejecutar_turno(estado):
         for _ in range(unidad.velocidad): #el for se repite n cantidad de veces (n = velocidad)
             #la velocidad representa la cantidad de bloques que se mueve
 
+            if unidad.esta_destruido():  #se verifica que la unidad aun siga viva
+                break
+    
             nueva_pos = calcular_movimiento(unidad, estado.mapa)
 
             if nueva_pos is None: #Si es None, significa que encontró un muro 
@@ -85,9 +92,11 @@ def ejecutar_turno(estado):
 
                     if objetivo is not None and objetivo.tipo in ("muro", "torre"): #Si es una torre o muro, la daña
                         objetivo.recibir_daño(unidad.daño)
+                        estado.dinero_atacante += 3  # por daño a torre — FALTA ESTO
 
                         if objetivo.esta_destruido(): #Si el impacto la daña, la borra de la matriz
                             estado.mapa[fila_frente][col_frente] = None
+                            estado.dinero_atacante += 10
                             if objetivo.tipo == "muro" and objetivo in estado.muros:
                                 estado.muros.remove(objetivo)
                             elif objetivo.tipo == "torre" and objetivo in estado.torres:
@@ -176,10 +185,6 @@ def preparar_nueva_ronda(estado):
 
     #se resetea vida de la base
     estado.base.vida = estado.base.vida_maxima
-
-    #se suma dinero de ronda a ambos
-    estado.dinero_defensor += DINERO_POR_RONDA
-    estado.dinero_atacante += DINERO_POR_RONDA
 
     #se avanza un ronda
     estado.ronda_actual += 1
