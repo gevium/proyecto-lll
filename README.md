@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/29182686/README.md)
 **DEFENSA Y ASALTO DE BASE**
 
 REQUISITOS
