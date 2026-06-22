@@ -2,7 +2,7 @@
 
 REQUISITOS
 
-* Python 3.10 o superior  
+* Python 3.10 o 3.11  
 * Tkinter (incluido con Python)
 * pygame (instalar con: pip install pygame)
 
