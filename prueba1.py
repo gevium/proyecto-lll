@@ -73,9 +73,7 @@ def ejecutar_turno(estado):
 
         if unidad.esta_destruido():
             continue  #si ya fue destruida solo se ignora, la limpieza se hace en las torres
-
-        objetivo_actual = None #se reinicia el objetivo atacado por esta unidad en este turno
-
+        
         for _ in range(unidad.velocidad): #el for se repite n cantidad de veces (n = velocidad)
             #la velocidad representa la cantidad de bloques que se mueve
 
@@ -101,7 +99,6 @@ def ejecutar_turno(estado):
 
                     if objetivo is not None and objetivo.tipo in ("muro", "torre"): #Si es una torre o muro, la daña
                         objetivo.recibir_daño(unidad.daño)
-                        objetivo_actual = objetivo #se guarda el objetivo atacado para la habilidad
                         estado.dinero_atacante += 3  #por daño a torre 
 
                         if objetivo.esta_destruido(): #Si el impacto la daña, la borra de la matriz
@@ -116,7 +113,6 @@ def ejecutar_turno(estado):
             if nueva_pos == (5, 5):
                 #llegó a la base, la ataca sin pisarla
                 estado.base.recibir_daño(unidad.daño)
-                objetivo_actual = estado.base #se guarda la base como objetivo para la habilidad
                 estado.dinero_atacante += 5
                 break
 
@@ -125,11 +121,10 @@ def ejecutar_turno(estado):
             unidad.posicion = nueva_pos
             estado.mapa[nueva_pos[0]][nueva_pos[1]] = unidad
 
-        #se descuenta el turno y se activa la habilidad si corresponde, con el objetivo real
-        if not unidad.esta_destruido():
-            unidad.turnos_restantes -= 1
-            if unidad.turnos_restantes <= 0:
-                unidad.activar_habilidad(estado, objetivo_actual)
+            if not unidad.esta_destruido() and nueva_pos != (5,5):
+                unidad.turnos_restantes -= 1
+                if unidad.turnos_restantes <= 0:
+                    unidad.activar_habilidad(estado, None)
 
     #Disparo de las torres
 
@@ -252,3 +247,4 @@ def ejecutar_combate(estado, actualizar_ui=None):
     #se agotaron los turnos sin ganador, gana el defensor
     estado.rondas_defensor += 1
     return "defensor"
+

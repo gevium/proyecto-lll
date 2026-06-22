@@ -9,7 +9,7 @@ DATOS DE LAS ENTIDADES (CONSTANTES)
 TORRES = {
     "basica": {"nombre": "Torre Basica", "costo": 50, "vida": 80, "daño": 15,"alcance": 2, "habilidad": "disparo_doble", "turnos_habilidad": 3},
     "pesada": {"nombre": "Torre Pesada", "costo": 120,"vida": 180, "daño": 25,"alcance": 2,"habilidad": "daño_area","turnos_habilidad": 4},
-    "magica": {"nombre": "Torre Magica","costo": 90, "vida": 60,"daño": 10, "alcance": 3,"habilidad": "congelar", "turnos_habilidad": 5}
+    "magica": {"nombre": "Torre Magica","costo": 90, "vida": 60,"daño": 10, "alcance": 3,"habilidad": "congelar", "turnos_habilidad": 3}
 }
  
 UNIDADES = {
@@ -29,6 +29,7 @@ FACCIONES = {
 #Valores iniciales
 DINERO_INICIAL_DEFENSOR = 200
 DINERO_INICIAL_ATACANTE = 200
+#ACLARACION: Se eliminó DINERO_RONDA (constante innecesaria)
 VIDA_BASE_CENTRAL = 200
 RONDAS_PARA_GANAR = 3
 
@@ -188,7 +189,7 @@ class Torre (Entidad):
         elif self.habilidad == "congelar":
             if objetivo is not None:
                 objetivo.congelada = True
-                objetivo.turnos_congelada = 2
+                objetivo.turnos_congelada = 4
 
         #REPARAR
         elif self.habilidad == "reparar":
