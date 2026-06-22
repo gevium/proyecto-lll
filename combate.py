@@ -64,6 +64,13 @@ def calcular_movimiento(unidad, mapa):
 def ejecutar_turno(estado):
 
     for unidad in estado.unidades: #se buscan las unidades actuales de la ronda
+
+        if unidad.congelada: #se verifica si esta congelada
+            unidad.turnos_congelada -= 1
+            if unidad.turnos_congelada <= 0:
+                unidad.congelada = False
+            continue
+
         if unidad.esta_destruido():
             continue  #si ya fue destruida solo se ignora, la limpieza se hace en las torres
         
@@ -92,7 +99,7 @@ def ejecutar_turno(estado):
 
                     if objetivo is not None and objetivo.tipo in ("muro", "torre"): #Si es una torre o muro, la daña
                         objetivo.recibir_daño(unidad.daño)
-                        estado.dinero_atacante += 3  # por daño a torre — FALTA ESTO
+                        estado.dinero_atacante += 3  #por daño a torre 
 
                         if objetivo.esta_destruido(): #Si el impacto la daña, la borra de la matriz
                             estado.mapa[fila_frente][col_frente] = None
@@ -113,6 +120,11 @@ def ejecutar_turno(estado):
             estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None
             unidad.posicion = nueva_pos
             estado.mapa[nueva_pos[0]][nueva_pos[1]] = unidad
+
+            if not unidad.esta_destruido() and nueva_pos != (5,5):
+                unidad.turnos_restantes -= 1
+                if unidad.turnos_restantes <= 0:
+                    unidad.activar_habilidad(estado, None)
 
     #Disparo de las torres
 
@@ -147,7 +159,10 @@ def ejecutar_turno(estado):
             #Actualización del estado de turno de la torre
             torre.turnos_restantes -= 1
             if torre.turnos_restantes <= 0:
-                torre.activar_habilidad(estado, objetivo)
+                if objetivo is not None and not objetivo.esta_destruido():
+                    torre.activar_habilidad(estado, objetivo)
+                else:
+                    torre.activar_habilidad(estado, None)
 
     #Limpieza de las unidades muertas de la lista principal
     for unidad_muerta in unidades_a_eliminar:
@@ -168,7 +183,7 @@ def verificar_fin_ronda(estado):
         return "defensor"
     
     #El atacante se queda sin dinero ni unidades
-    if estado.dinero_atacante <= 0 and len(estado.unidades) == 0:
+    if estado.dinero_atacante < 40 and len(estado.unidades) == 0:
         return "defensor"
 
     #la ronda sigue
@@ -182,6 +197,10 @@ def preparar_nueva_ronda(estado):
         if unidad.posicion is not None:
             estado.mapa[unidad.posicion[0]][unidad.posicion[1]] = None
     estado.unidades = []
+
+    #Se verifica que el atacante tengo como minimo 40$
+    if estado.dinero_atacante < 40:
+        estado.dinero_atacante = 40
 
     #se resetea vida de la base
     estado.base.vida = estado.base.vida_maxima
